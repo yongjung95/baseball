@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+</head>
+<body>
+
+<main>
+    <section>
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+            <label for="passwd">Password:</label>
+            <input type="password" id="passwd" name="passwd" required>
+            <button type="submit">Login</button>
+            <button type="button" id="signUp" style="background-color: #007bff;">회원 가입</button>
+        </form>
+
+    </section>
+</main>
+
+<script>
+    $(document).ready(function () {
+        $('#signUp').on('click', function () {
+            window.location.href = '/signUp';
+        });
+
+        $('#loginForm').on('submit', function (event) {
+            event.preventDefault(); // 폼 제출 기본 동작 방지
+
+            // 입력 값 가져오기
+            var email = $('#email').val();
+            var passwd = $('#passwd').val();
+
+            // AJAX 요청 보내기
+            $.ajax({
+                url: '/login',
+                type: 'POST',
+                contentType: 'application/json', // JSON 형식으로 데이터 전송
+                data: JSON.stringify({ // JSON 형태로 데이터 변환
+                    email: email,
+                    passwd: passwd
+                }),
+                success: function (response) {
+                    if (response.status === 200) {
+                        alert("로그인 성공");
+                        location.href = "/";
+                    } else {
+                        alert("회원 정보가 없습니다.");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

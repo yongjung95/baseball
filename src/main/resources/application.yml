@@ -19,3 +19,5 @@ spring:
     init:
       mode: always
       platform: h2
+  thymeleaf:
+    cache: false

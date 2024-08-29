@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+</head>
+<body>
+
+<main>
+    <section>
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="nickName">닉네임:</label>
+            <input type="text" id="nickName" name="nickName" required>
+
+            <label for="teamId">응원팀 선택:</label>
+            <select id="teamId" name="teamId" required>
+                <option value="">-- Select a Team --</option>
+                <option value="">미정</option>
+                <option th:each="team : ${teamList}" th:value="${team.getTeamId()}" th:text="${team.getTeamName()}"></option> <!-- 팀 목록을 동적으로 생성 -->
+            </select>
+
+            <button type="submit">Sign Up</button>
+        </form>
+    </section>
+</main>
+
+<script>
+    $(document).ready(function () {
+        $('#signupForm').on('submit', function (event) {
+            event.preventDefault(); // 폼 제출 기본 동작 방지
+
+            // 입력 값 가져오기
+            var email = $('#email').val();
+            var passwd = $('#passwd').val();
+            var nickName = $('#nickName').val();
+            var teamId = $('#teamId').val();
+
+            // AJAX 요청 보내기
+            $.ajax({
+                url: '/member',
+                type: 'POST',
+                contentType: 'application/json', // JSON 형식으로 데이터 전송
+                data: JSON.stringify({ // JSON 형태로 데이터 변환
+                    email: email,
+                    passwd: passwd,
+                    nickName: nickName,
+                    teamId: teamId
+                }),
+                success: function (response) {
+                    if (response.status === 200) {
+                        alert("회원가입 성공");
+                        location.href = "/login";
+                    } else {
+                        alert("회원가입 실패");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
