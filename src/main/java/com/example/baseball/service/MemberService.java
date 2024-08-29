@@ -5,6 +5,8 @@ import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.TeamRepository;
+import com.example.baseball.response.error.ApiException;
+import com.example.baseball.response.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,7 +34,7 @@ public class MemberService {
                 .memberId(UUID.randomUUID().toString())
                 .email(dto.getEmail())
                 .nickName(dto.getNickName())
-                .passwd(dto.getPassword())
+                .passwd(dto.getPasswd())
                 .follwedTeam(findTeam)
                 .build();
 
@@ -40,6 +42,18 @@ public class MemberService {
 
         MemberDto.ResponseMemberDto result = modelMapper.map(member, MemberDto.ResponseMemberDto.class);
         result.setTeamName(member.getFollwedTeam() == null ? null : member.getFollwedTeam().getTeamName());
+
+        return result;
+    }
+
+    public MemberDto.ResponseMemberDto login(MemberDto.LoginMemberRequestDto dto) {
+        Member findMember = memberRepository.findByEmail(dto.getEmail());
+        if (findMember == null || !findMember.getPasswd().equals(dto.getPasswd())) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
+        result.setTeamName(findMember.getFollwedTeam() == null ? null : findMember.getFollwedTeam().getTeamName());
 
         return result;
     }

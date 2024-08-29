@@ -20,4 +20,9 @@ public class MemberController {
     public SingleResult<?> member(@RequestBody MemberDto.SaveMemberRequestDto dto) {
         return responseService.getSingleResult(memberService.saveMember(dto));
     }
+
+    @PostMapping("/login")
+    public SingleResult<?> login(@RequestBody MemberDto.LoginMemberRequestDto dto) {
+        return responseService.getSingleResult(memberService.login(dto));
+    }
 }

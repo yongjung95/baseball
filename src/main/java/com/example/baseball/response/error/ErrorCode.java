@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
-    PARAMETER_IS_EMPTY(400,"C000","파라미터가 올바르지 않습니다.");
+    PARAMETER_IS_EMPTY(400,"C000","파라미터가 올바르지 않습니다."),
+
+    // 회원 관련
+    MEMBER_IS_NOT_FOUND(403, "M001", "회원 정보가 없습니다.");
 
 
     private final String code;

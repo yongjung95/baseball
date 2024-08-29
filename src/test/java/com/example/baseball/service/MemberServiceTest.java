@@ -3,6 +3,7 @@ package com.example.baseball.service;
 import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.TeamRepository;
+import com.example.baseball.response.error.ApiException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPassword("1234");
+        requestDto.setPasswd("1234");
         requestDto.setNickName("정이");
 
         //when
@@ -45,7 +46,7 @@ class MemberServiceTest {
 
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPassword("1234");
+        requestDto.setPasswd("1234");
         requestDto.setNickName("정이");
         requestDto.setTeamId(findTeam.getTeamId());
 
@@ -61,12 +62,53 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPassword("1234");
+        requestDto.setPasswd("1234");
         requestDto.setNickName("정이");
         //when
         MemberDto.ResponseMemberDto responseMemberDto = memberService.saveMember(requestDto);
 
         //then
         assertThat(responseMemberDto.getTeamName()).isNull();
+    }
+
+    @Test
+    void 로그인_성공() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPasswd("1234");
+        requestDto.setNickName("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
+        dto.setEmail("yongjung95@gmail.com");
+        dto.setPasswd("1234");
+
+        MemberDto.ResponseMemberDto result = memberService.login(dto);
+
+        //then
+
+        assertThat(result.getNickName()).isEqualTo("정이");
+    }
+
+    @Test
+    void 로그인_실패() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPasswd("1234");
+        requestDto.setNickName("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
+        dto.setEmail("yongjung95@gmail.com");
+        dto.setPasswd("1233");
+
+        //then
+        Assertions.assertThatThrownBy(() -> memberService.login(dto)).isInstanceOf(ApiException.class);
     }
 }

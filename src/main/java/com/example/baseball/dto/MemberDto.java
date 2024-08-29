@@ -7,7 +7,7 @@ public class MemberDto {
     @Data
     public static class SaveMemberRequestDto {
         private String email;
-        private String password;
+        private String passwd;
         private String nickName;
         private String teamId;
     }
@@ -18,5 +18,11 @@ public class MemberDto {
         private String email;
         private String nickName;
         private String teamName;
+    }
+
+    @Data
+    public static class LoginMemberRequestDto {
+        private String email;
+        private String passwd;
     }
 }
