@@ -19,8 +19,8 @@ public class Member {
     @Id
     private String memberId;
     private String email;
-    private String nickName;
-    private String passwd;
+    private String nickname;
+    private String password;
 
     @ManyToOne
     @JoinColumn(name = "team_id")

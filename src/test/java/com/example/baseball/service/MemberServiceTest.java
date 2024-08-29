@@ -29,14 +29,14 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPasswd("1234");
-        requestDto.setNickName("정이");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
 
         //when
         MemberDto.ResponseMemberDto responseMemberDto = memberService.saveMember(requestDto);
 
         //then
-        assertThat(responseMemberDto.getNickName()).isEqualTo(requestDto.getNickName());
+        assertThat(responseMemberDto.getNickname()).isEqualTo(requestDto.getNickname());
     }
 
     @Test
@@ -46,8 +46,8 @@ class MemberServiceTest {
 
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPasswd("1234");
-        requestDto.setNickName("정이");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
         requestDto.setTeamId(findTeam.getTeamId());
 
         //when
@@ -62,8 +62,8 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPasswd("1234");
-        requestDto.setNickName("정이");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
         //when
         MemberDto.ResponseMemberDto responseMemberDto = memberService.saveMember(requestDto);
 
@@ -76,21 +76,21 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPasswd("1234");
-        requestDto.setNickName("정이");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
 
         memberService.saveMember(requestDto);
 
         //when
         MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
         dto.setEmail("yongjung95@gmail.com");
-        dto.setPasswd("1234");
+        dto.setPassword("1234");
 
         MemberDto.ResponseMemberDto result = memberService.login(dto);
 
         //then
 
-        assertThat(result.getNickName()).isEqualTo("정이");
+        assertThat(result.getNickname()).isEqualTo("정이");
     }
 
     @Test
@@ -98,17 +98,86 @@ class MemberServiceTest {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
         requestDto.setEmail("yongjung95@gmail.com");
-        requestDto.setPasswd("1234");
-        requestDto.setNickName("정이");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
 
         memberService.saveMember(requestDto);
 
         //when
         MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
         dto.setEmail("yongjung95@gmail.com");
-        dto.setPasswd("1233");
+        dto.setPassword("1233");
 
         //then
         Assertions.assertThatThrownBy(() -> memberService.login(dto)).isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    void 이메일_중복확인() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        boolean result = memberService.checkEmail("yongjung9@gmail.com");
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void 이메일_중복확인_실패() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        String email = "yongjung95@gmail.com";
+
+        //then
+        Assertions.assertThatThrownBy(() -> memberService.checkEmail(email)).isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    void 닉네임_중복확인() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        boolean result = memberService.checkNickname("정이2");
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void 닉네임_중복확인_실패() {
+        //given
+        MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setPassword("1234");
+        requestDto.setNickname("정이");
+
+        memberService.saveMember(requestDto);
+
+        //when
+        String nickname = "정이";
+
+        //then
+        Assertions.assertThatThrownBy(() -> memberService.checkNickname(nickname)).isInstanceOf(ApiException.class);
+
     }
 }

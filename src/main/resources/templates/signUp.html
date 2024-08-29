@@ -6,39 +6,64 @@
 
 <main>
     <section>
-        <h2>Sign Up</h2>
+        <h2>회원가입</h2>
         <form id="signupForm">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
+            <button type="button" id="checkEmail" class="btn check-btn">이메일 중복확인</button>
+
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
 
-            <label for="nickName">닉네임:</label>
-            <input type="text" id="nickName" name="nickName" required>
+            <label for="nickname">닉네임:</label>
+            <input type="text" id="nickname" name="nickname" required>
+            <button type="button" id="checkNickname" class="btn check-btn">닉네임 중복확인</button>
 
             <label for="teamId">응원팀 선택:</label>
-            <select id="teamId" name="teamId" required>
+            <select id="teamId" name="teamId">
                 <option value="">-- Select a Team --</option>
                 <option value="">미정</option>
-                <option th:each="team : ${teamList}" th:value="${team.getTeamId()}" th:text="${team.getTeamName()}"></option> <!-- 팀 목록을 동적으로 생성 -->
+                <option th:each="team : ${teamList}" th:value="${team.getTeamId()}"
+                        th:text="${team.getTeamName()}"></option> <!-- 팀 목록을 동적으로 생성 -->
             </select>
 
-            <button type="submit">Sign Up</button>
+            <button type="submit">회원가입</button>
         </form>
     </section>
 </main>
 
 <script>
     $(document).ready(function () {
+        var checkEmail = false;
+        var checkNickname = false;
+
+        $('#email').on('input', function () {
+            checkEmail = false;
+        });
+
+        $('#nickname').on('input', function () {
+            checkNickname = false;
+        });
+
         $('#signupForm').on('submit', function (event) {
             event.preventDefault(); // 폼 제출 기본 동작 방지
 
             // 입력 값 가져오기
             var email = $('#email').val();
-            var passwd = $('#passwd').val();
-            var nickName = $('#nickName').val();
+            var password = $('#password').val();
+            var nickname = $('#nickname').val();
             var teamId = $('#teamId').val();
+
+            if (!checkEmail) {
+                alert('이메일 중복 확인을 먼저 해주세요.');
+                return;
+            }
+
+            if (!checkNickname) {
+                alert('닉네임 중복 확인을 먼저 해주세요.');
+                return;
+            }
 
             // AJAX 요청 보내기
             $.ajax({
@@ -47,17 +72,68 @@
                 contentType: 'application/json', // JSON 형식으로 데이터 전송
                 data: JSON.stringify({ // JSON 형태로 데이터 변환
                     email: email,
-                    passwd: passwd,
-                    nickName: nickName,
+                    password: password,
+                    nickname: nickname,
                     teamId: teamId
                 }),
                 success: function (response) {
                     if (response.status === 200) {
-                        alert("회원가입 성공");
+                        alert('회원가입 성공');
                         location.href = "/login";
                     } else {
-                        alert("회원가입 실패");
+                        alert(response.message);
                     }
+                },
+                error: function() {
+                    alert('에러 발생');
+                }
+            });
+        });
+
+        $('#checkEmail').on('click', function() {
+            var email = $('#email').val();
+
+            $.ajax({
+                url: '/check-email',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ email: email }),
+                success: function(response) {
+                    if (response.status === 200) {
+                        alert('해당 이메일은 사용 가능합니다.');
+                        $('#email').prop('disabled', true);
+                        $('#checkEmail').prop('disabled', true);
+                        checkEmail = true;
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('에러 발생');
+                }
+            });
+        });
+
+        $('#checkNickname').on('click', function() {
+            var nickname = $('#nickname').val();
+
+            $.ajax({
+                url: '/check-nickname',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ nickname: nickname }),
+                success: function(response) {
+                    if (response.status === 200) {
+                        alert('해당 닉네임은 사용 가능합니다.');
+                        $('#nickname').prop('disabled', true);
+                        $('#checkNickname').prop('disabled', true);
+                        checkNickname = true;
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('에러 발생');
                 }
             });
         });

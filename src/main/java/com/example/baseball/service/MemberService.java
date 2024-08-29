@@ -33,8 +33,8 @@ public class MemberService {
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
                 .email(dto.getEmail())
-                .nickName(dto.getNickName())
-                .passwd(dto.getPasswd())
+                .nickname(dto.getNickname())
+                .password(dto.getPassword())
                 .follwedTeam(findTeam)
                 .build();
 
@@ -48,7 +48,7 @@ public class MemberService {
 
     public MemberDto.ResponseMemberDto login(MemberDto.LoginMemberRequestDto dto) {
         Member findMember = memberRepository.findByEmail(dto.getEmail());
-        if (findMember == null || !findMember.getPasswd().equals(dto.getPasswd())) {
+        if (findMember == null || !findMember.getPassword().equals(dto.getPassword())) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
@@ -56,5 +56,21 @@ public class MemberService {
         result.setTeamName(findMember.getFollwedTeam() == null ? null : findMember.getFollwedTeam().getTeamName());
 
         return result;
+    }
+
+    public boolean checkEmail(String email) {
+        Member findMember = memberRepository.findByEmail(email);
+        if (findMember != null) {
+            throw new ApiException(ErrorCode.EMAIL_IS_DUPLICATE);
+        }
+        return true;
+    }
+
+    public boolean checkNickname(String nickname) {
+        Member findMember = memberRepository.findByNickname(nickname);
+        if (findMember != null) {
+            throw new ApiException(ErrorCode.NICKNAME_IS_DUPLICATE);
+        }
+        return true;
     }
 }

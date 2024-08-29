@@ -21,3 +21,10 @@ spring:
       platform: h2
   thymeleaf:
     cache: false
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: trace

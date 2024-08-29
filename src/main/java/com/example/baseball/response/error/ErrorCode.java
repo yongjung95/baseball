@@ -8,7 +8,9 @@ public enum ErrorCode {
     PARAMETER_IS_EMPTY(400,"C000","파라미터가 올바르지 않습니다."),
 
     // 회원 관련
-    MEMBER_IS_NOT_FOUND(403, "M001", "회원 정보가 없습니다.");
+    MEMBER_IS_NOT_FOUND(403, "M001", "회원 정보가 없습니다."),
+    EMAIL_IS_DUPLICATE(403, "M002", "이미 등록된 이메일입니다."),
+    NICKNAME_IS_DUPLICATE(403, "M003", "이미 등록된 닉네임입니다.");
 
 
     private final String code;
