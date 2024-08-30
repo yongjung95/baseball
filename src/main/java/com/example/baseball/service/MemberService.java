@@ -30,6 +30,11 @@ public class MemberService {
              findTeam = teamRepository.findByTeamId(dto.getTeamId());
         }
 
+        Member findMember = memberRepository.findByEmail(dto.getEmail());
+        if (findMember != null) {
+            throw new ApiException(ErrorCode.EMAIL_IS_DUPLICATE);
+        }
+
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
                 .email(dto.getEmail())
