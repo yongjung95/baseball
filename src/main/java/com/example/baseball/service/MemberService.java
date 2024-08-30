@@ -35,13 +35,13 @@ public class MemberService {
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .password(dto.getPassword())
-                .follwedTeam(findTeam)
+                .followedTeam(findTeam)
                 .build();
 
         memberRepository.save(member);
 
         MemberDto.ResponseMemberDto result = modelMapper.map(member, MemberDto.ResponseMemberDto.class);
-        result.setTeamName(member.getFollwedTeam() == null ? null : member.getFollwedTeam().getTeamName());
+        result.setTeamName(member.getFollowedTeam() == null ? null : member.getFollowedTeam().getTeamName());
 
         return result;
     }
@@ -53,7 +53,7 @@ public class MemberService {
         }
 
         MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
-        result.setTeamName(findMember.getFollwedTeam() == null ? null : findMember.getFollwedTeam().getTeamName());
+        result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
 
         return result;
     }

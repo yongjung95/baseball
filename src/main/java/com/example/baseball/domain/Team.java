@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Team {
+public class Team extends BaseTimeEntity {
 
     @Id
     private String teamId;

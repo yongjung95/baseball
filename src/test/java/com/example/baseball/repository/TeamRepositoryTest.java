@@ -28,7 +28,7 @@ class TeamRepositoryTest {
         //given
         Team team = Team.builder()
                 .teamId(UUID.randomUUID().toString())
-                .teamName("SSG 랜더스")
+                .teamName("SSG")
                 .build();
 
         teamRepository.save(team);
@@ -37,7 +37,7 @@ class TeamRepositoryTest {
         entityManager.clear();
 
         //when
-        Team findTeam = teamRepository.findByTeamName("SSG 랜더스");
+        Team findTeam = teamRepository.findByTeamName("SSG");
 
         //then
         assertThat(findTeam.getTeamName()).isEqualTo(team.getTeamName());

@@ -57,6 +57,12 @@ public class ResponseService {
         return result;
     }
 
+    public <T> SingleResult<T> getSuccessResult() {
+        SingleResult<T> result = new SingleResult<>();
+        setSuccessResult(result);
+        return result;
+    }
+
     public <T> SingleResult<T> getFailResult(ErrorCode errorCode) {
         SingleResult<T> result = new SingleResult<>();
 
