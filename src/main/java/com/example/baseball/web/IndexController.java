@@ -23,7 +23,7 @@ public class IndexController {
         return "login";
     }
 
-    @GetMapping("/signUp")
+    @GetMapping("/sign-up")
     public String string(Model model) {
         model.addAttribute("teamList", teamService.selectTeamDtoList());
         return "signUp";

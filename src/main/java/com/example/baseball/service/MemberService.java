@@ -7,6 +7,7 @@ import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.TeamRepository;
 import com.example.baseball.response.error.ApiException;
 import com.example.baseball.response.error.ErrorCode;
+import com.example.baseball.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,11 +24,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
     private final ModelMapper modelMapper;
+    private final JwtUtil jwtUtil;
 
     public MemberDto.ResponseMemberDto saveMember(MemberDto.SaveMemberRequestDto dto) {
         Team findTeam = null;
         if (StringUtils.hasText(dto.getTeamId())) {
-             findTeam = teamRepository.findByTeamId(dto.getTeamId());
+            findTeam = teamRepository.findByTeamId(dto.getTeamId());
         }
 
         Member findMember = memberRepository.findByEmail(dto.getEmail());
@@ -51,16 +53,13 @@ public class MemberService {
         return result;
     }
 
-    public MemberDto.ResponseMemberDto login(MemberDto.LoginMemberRequestDto dto) {
+    public String login(MemberDto.LoginMemberRequestDto dto) {
         Member findMember = memberRepository.findByEmail(dto.getEmail());
         if (findMember == null || !findMember.getPassword().equals(dto.getPassword())) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
-        MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
-        result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
-
-        return result;
+        return jwtUtil.createAccessToken(findMember.getMemberId());
     }
 
     public boolean checkEmail(String email) {

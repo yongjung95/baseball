@@ -28,3 +28,6 @@ logging:
         orm:
           jdbc:
             bind: trace
+jwt:
+  expiration_time: 3600000
+  secret: BaseballSecretKeyBaseballSecretKey
