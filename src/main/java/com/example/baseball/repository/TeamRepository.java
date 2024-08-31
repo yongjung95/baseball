@@ -7,4 +7,5 @@ public interface TeamRepository extends JpaRepository<Team, String> {
 
     Team findByTeamName(String teamName);
     Team findByTeamId(String teamId);
+    Team findBySymbol(String symbol);
 }

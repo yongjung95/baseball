@@ -22,25 +22,25 @@ public class PostController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/post")
-    public SingleResult<?> post(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
+    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
         if (bindResult.hasErrors()) {
             for (ObjectError allError : bindResult.getAllErrors()) {
                 return responseService.getFailParameter(allError.getDefaultMessage());
             }
         }
 
-        String memberId = jwtUtil.getMemberId(token.replace("Bearer ", ""));
+        String memberId = jwtUtil.getMemberId(token);
         dto.setAuthorId(memberId);
 
         return responseService.getSingleResult(postService.savePost(dto));
     }
 
     @PostMapping("/post/{postId}")
-    public SingleResult<?> post(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
+    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token, @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
         if (postId == null || postId <= 0) {
             return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
         }
-        String memberId = jwtUtil.getMemberId(token.replace("Bearer ", ""));
+        String memberId = jwtUtil.getMemberId(token);
         dto.setAuthorId(memberId);
         dto.setPostId(postId);
 
@@ -51,5 +51,4 @@ public class PostController {
 
         return responseService.getSingleResult(postService.updatePost(dto));
     }
-
 }

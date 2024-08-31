@@ -1,5 +1,6 @@
 package com.example.baseball.util;
 
+import com.example.baseball.dto.MemberDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -32,28 +33,28 @@ public class JwtUtil {
     /**
      * Access Token 생성
      *
-     * @param memberId
+     * @param dto
      * @return Access Token String
      */
-    public String createAccessToken(String memberId) {
-        return createToken(memberId, accessTokenExpTime);
+    public String createAccessToken(MemberDto.ResponseMemberDto dto) {
+        return createToken(dto, accessTokenExpTime);
     }
 
 
     /**
      * JWT 생성
      *
-     * @param memberId
+     * @param dto
      * @param expireTime
      * @return JWT String
      */
-    private String createToken(String memberId, long expireTime) {
+    private String createToken(MemberDto.ResponseMemberDto dto, long expireTime) {
         Claims claims = Jwts.claims();
-        claims.put("memberId", memberId);
+        claims.put("memberId", dto.getMemberId());
+        claims.put("teamName", dto.getTeamName());
 
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);
-
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -72,6 +73,16 @@ public class JwtUtil {
      */
     public String getMemberId(String token) {
         return parseClaims(token).get("memberId", String.class);
+    }
+
+    /**
+     * Token에서 Team Name 추출
+     *
+     * @param token
+     * @return User ID
+     */
+    public String getTeamName(String token) {
+        return parseClaims(token).get("teamName", String.class);
     }
 
 

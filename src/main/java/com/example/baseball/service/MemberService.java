@@ -59,7 +59,10 @@ public class MemberService {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
-        return jwtUtil.createAccessToken(findMember.getMemberId());
+        MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
+        result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
+
+        return jwtUtil.createAccessToken(result);
     }
 
     public boolean checkEmail(String email) {

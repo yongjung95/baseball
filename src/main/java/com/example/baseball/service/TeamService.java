@@ -5,6 +5,7 @@ import com.example.baseball.repository.TeamRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -23,7 +24,12 @@ public class TeamService {
         return modelMapper.map(teamRepository.findByTeamId(teamId), TeamDto.SelectTeamDto.class);
     }
 
+    @Cacheable("teamList")
     public List<TeamDto.SelectTeamDto> selectTeamDtoList() {
         return teamRepository.findAll().stream().map(team -> modelMapper.map(team, TeamDto.SelectTeamDto.class)).collect(Collectors.toList());
+    }
+
+    public TeamDto.SelectTeamDto selectTeamBySymbol(String symbol) {
+        return modelMapper.map(teamRepository.findBySymbol(symbol), TeamDto.SelectTeamDto.class);
     }
 }

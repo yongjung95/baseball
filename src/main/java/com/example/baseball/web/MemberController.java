@@ -5,6 +5,9 @@ import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.model.SingleResult;
 import com.example.baseball.response.service.ResponseService;
 import com.example.baseball.service.MemberService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
@@ -32,13 +35,16 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public SingleResult<?> login(@RequestBody @Valid MemberDto.LoginMemberRequestDto dto, BindingResult bindResult) {
+    public SingleResult<?> login(@RequestBody @Valid MemberDto.LoginMemberRequestDto dto, BindingResult bindResult, HttpServletResponse response) {
         if (bindResult.hasErrors()) {
             for (ObjectError allError : bindResult.getAllErrors()) {
                 return responseService.getFailParameter(allError.getDefaultMessage());
             }
         }
-        return responseService.getSingleResult(memberService.login(dto));
+        String token = memberService.login(dto);
+        response.addHeader("Set-Cookie", "token=" + token + "; HttpOnly; Secure; Path=/; Max-Age=3600;");
+
+        return responseService.getSuccessResult();
     }
 
     @PostMapping("/check-email")

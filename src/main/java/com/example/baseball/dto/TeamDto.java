@@ -10,5 +10,6 @@ public class TeamDto {
         private String teamName;
         private String logo;
         private String description;
+        private String symbol;
     }
 }

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+    <style>
+        .form-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .form-section .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<main class="container mt-5">
+    <section class="form-section">
+        <h2>새 게시물 작성</h2>
+        <form id="postForm">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea class="form-control" id="content" name="content" rows="10" placeholder="내용을 입력하세요" required></textarea>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary">글 작성하기</button>
+                <button type="button" class="btn btn-secondary" id="cancelButton">취소</button>
+            </div>
+        </form>
+    </section>
+</main>
+<script>
+    $('#postForm').on('submit', function(event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        // 폼 데이터 수집
+        var formData = {
+            title: $('#title').val(),
+            author: $('#author').val(),
+            content: $('#content').val()
+        };
+
+        // AJAX 요청
+        $.ajax({
+            type: 'POST',
+            url: '/post', // 게시물 작성 처리 경로
+            data: JSON.stringify(formData),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(response) {
+                // 성공 메시지 출력
+                $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
+                $('#postForm')[0].reset(); // 폼 초기화
+            },
+            error: function(xhr, status, error) {
+                // 에러 메시지 출력
+                $('#message').html('<div class="alert alert-danger">게시물 작성에 실패했습니다. 다시 시도해주세요.</div>');
+            }
+        });
+    });
+
+    // 취소 버튼 클릭 시 이전 페이지로 이동
+    $('#cancelButton').on('click', function() {
+        window.history.back(); // 이전 페이지로 이동
+    });
+</script>
+</body>
+</html>
