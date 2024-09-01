@@ -30,9 +30,9 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
     public Page<Post> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
         List<Post> results = queryFactory.select(post)
                 .from(post)
-                .leftJoin(post.author, member)
+                .join(post.author, member)
                 .fetchJoin()
-                .leftJoin(post.followedTeam, team)
+                .join(post.followedTeam, team)
                 .fetchJoin()
                 .where(post.followedTeam.teamId.eq(teamId)
                         .and(post.isUse.isTrue())

@@ -102,6 +102,12 @@ public class PostService {
         return new PageImpl<>(result, pageable, postList.getTotalElements());
     }
 
+    public PostDto.ResponsePostDto selectPost(Long postId) {
+        Post post = postRepository.findByPostId(postId);
+
+        return convertToDto(post);
+    }
+
     private PostDto.ResponsePostDto convertToDto(Post post) {
         PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
         responsePostDto.setAuthorNickname(post.getAuthor().getNickname());

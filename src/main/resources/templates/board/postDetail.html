@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+    <style>
+        .comment-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<main class="container">
+    <section>
+        <h2 th:text="${post.title}">게시글 제목</h2>
+        <p><span th:text="${post.authorNickname}">작성자</span>  <span th:text="${post.createDate}">작성일</span></p>
+        <hr>
+        <div th:text="${post.content}">게시글 내용</div>
+        <hr>
+
+<!--        <h3>댓글</h3>-->
+<!--        <div class="comment-section" >-->
+<!--            <div class="comment">-->
+<!--                <p><strong >댓글 작성자</strong> <span></span></p>-->
+<!--                <p >댓글 내용</p>-->
+<!--                <hr>-->
+<!--            </div>-->
+<!--        </div>-->
+<!---->
+<!--        <form id="commentForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="commentContent">댓글 작성:</label>-->
+<!--                <textarea class="form-control" id="commentContent" name="commentContent" rows="3" required></textarea>-->
+<!--            </div>-->
+<!--            <button type="submit" class="btn btn-primary">댓글 작성</button>-->
+<!--        </form>-->
+    </section>
+</main>
+
+<script>
+    $(document).ready(function () {
+        $('#commentForm').on('submit', function (event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            var content = $('#commentContent').val();
+
+            $.ajax({
+                url: '/posts/{postId}/comments', // 여기에 게시글 ID 추가
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ content: content }),
+                success: function (response) {
+                    alert('댓글이 작성되었습니다.');
+                    location.reload(); // 댓글 작성 후 페이지 새로 고침
+                },
+                error: function () {
+                    alert('댓글 작성 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

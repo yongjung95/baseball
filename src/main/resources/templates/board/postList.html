@@ -8,7 +8,7 @@
     <section>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 th:text="${teamName}"></h2>
-            <a class="btn btn-primary" th:href="@{/board/post}" role="button">글작성하기</a>
+            <a class="btn btn-primary" th:if="${isLoggedIn && isSymbolMatched}" th:href="@{/board/post}" role="button">글작성하기</a>
         </div>
         <table class="table table-hover board-table">
             <thead class="thead-light">
@@ -22,7 +22,7 @@
             <tbody>
             <tr th:each="post, stat : ${postList.getContent()}">
                 <td class="text-left">
-                    <a th:href="@{/post/{postId}(id=${post.getPostId()})}" th:text="${post.getTitle()}">게시물 제목</a>
+                    <a th:href="@{/board/post/{postId}(postId=${post.getPostId()})}" th:text="${post.getTitle()}">게시물 제목</a>
                 </td>
                 <td th:text="${post.getAuthorNickname()}">작성자</td>
                 <td th:text="${post.getCreateDate()}">작성일</td>

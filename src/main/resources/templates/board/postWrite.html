@@ -63,6 +63,7 @@
                 // 성공 메시지 출력
                 $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
                 $('#postForm')[0].reset(); // 폼 초기화
+                location.href = "/board/post/" + response.data.postId;
             },
             error: function(xhr, status, error) {
                 // 에러 메시지 출력

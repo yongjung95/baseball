@@ -12,14 +12,13 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -218,9 +217,44 @@ class PostServiceTest {
         String searchText = "게시글";
 
         //then
-        List<PostDto.ResponsePostDto> result = postService.selectPostList(searchText, team.getTeamId(), pageRequest);
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getTeamName()).isEqualTo("SSG");
+        Page<PostDto.ResponsePostDto> result = postService.selectPostList(searchText, team.getTeamId(), pageRequest);
+        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getTeamName()).isEqualTo("SSG");
+    }
 
+    @Test
+    void 게시글_상세_조회() throws Exception {
+        //given
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+        entityManager.persist(team);
+
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member);
+
+        Post post = Post.builder()
+                .title("게시글 테스트")
+                .content("내용")
+                .author(member)
+                .followedTeam(team)
+                .build();
+
+        entityManager.persist(post);
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        PostDto.ResponsePostDto resultDto = postService.selectPost(post.getPostId());
+
+        //then
+        assertThat(resultDto.getTitle()).isEqualTo(post.getTitle());
     }
 }
