@@ -36,7 +36,8 @@ public class PostController {
     }
 
     @PostMapping("/post/{postId}")
-    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token, @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
+    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token,
+                                @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
         if (postId == null || postId <= 0) {
             return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
         }

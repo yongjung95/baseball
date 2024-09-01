@@ -105,6 +105,10 @@ public class PostService {
     public PostDto.ResponsePostDto selectPost(Long postId) {
         Post post = postRepository.findByPostId(postId);
 
+        if (post == null) {
+            throw new ApiException(ErrorCode.POST_IS_NOT_FOUND);
+        }
+
         return convertToDto(post);
     }
 
@@ -112,6 +116,8 @@ public class PostService {
         PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
         responsePostDto.setAuthorNickname(post.getAuthor().getNickname());
         responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
+        responsePostDto.setSymbol(post.getFollowedTeam().getSymbol());
+        responsePostDto.setAuthorId(post.getAuthor().getMemberId());
         responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
         return responsePostDto;
     }

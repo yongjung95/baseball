@@ -57,7 +57,8 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
                 .from(post)
                 .join(post.author, member).fetchJoin()
                 .join(post.followedTeam, team).fetchJoin()
-                .where(post.postId.eq(postId))
+                .where(post.postId.eq(postId)
+                        .and(post.isUse.isTrue()))
                 .fetchOne();
     }
 

@@ -88,9 +88,38 @@ public class IndexController {
     }
 
     @GetMapping("/board/post/{postId}")
-    public String boardPost(@PathVariable(name = "postId") Long postId, Model model) {
+    public String boardPost(@PathVariable(name = "postId") Long postId,
+                            @CookieValue(value = "token", required = false) String token, Model model) {
         PostDto.ResponsePostDto responsePostDto = postService.selectPost(postId);
         model.addAttribute("post", responsePostDto);
+
+        boolean isAuthor = false;
+        if (StringUtils.hasText(token)) {
+            String memberId = jwtUtil.getMemberId(token);
+
+            if (responsePostDto.getAuthorId().equals(memberId)) {
+                isAuthor = true;
+            }
+        }
+
+        model.addAttribute("isAuthor", isAuthor);
         return "board/postDetail";
+    }
+
+    @GetMapping("/board/post/{postId}/edit")
+    public String boardPostEdit(@PathVariable(name = "postId") Long postId,
+                            @CookieValue(value = "token", required = false) String token, Model model) {
+        PostDto.ResponsePostDto responsePostDto = postService.selectPost(postId);
+        model.addAttribute("post", responsePostDto);
+
+        if (StringUtils.hasText(token)) {
+            String memberId = jwtUtil.getMemberId(token);
+
+            if (responsePostDto.getAuthorId().equals(memberId)) {
+                return "board/postEdit";
+            }
+        }
+
+        return "redirect:/";
     }
 }

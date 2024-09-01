@@ -21,6 +21,13 @@ spring:
       platform: h2
   thymeleaf:
     cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+    thymeleaf:
+      cache: true
 logging:
   level:
     org:

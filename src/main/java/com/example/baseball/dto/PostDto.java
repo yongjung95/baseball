@@ -30,8 +30,10 @@ public class PostDto {
         private String postId;
         private String title;
         private String content;
+        private String authorId;
         private String authorNickname;
         private String teamName;
+        private String symbol;
         private String createDate;
     }
 
