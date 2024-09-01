@@ -106,7 +106,7 @@ public class PostService {
         Post post = postRepository.findByPostId(postId);
 
         if (post == null) {
-            throw new ApiException(ErrorCode.POST_IS_NOT_FOUND);
+            return null;
         }
 
         return convertToDto(post);

@@ -91,6 +91,10 @@ public class IndexController {
     public String boardPost(@PathVariable(name = "postId") Long postId,
                             @CookieValue(value = "token", required = false) String token, Model model) {
         PostDto.ResponsePostDto responsePostDto = postService.selectPost(postId);
+
+        if (responsePostDto == null) {
+            return "redirect:/";
+        }
         model.addAttribute("post", responsePostDto);
 
         boolean isAuthor = false;
