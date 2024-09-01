@@ -83,7 +83,10 @@ public class IndexController {
     }
 
     @GetMapping("/board/post")
-    public String boardPost() {
+    public String boardPost(@CookieValue(value = "token", required = false) String token) {
+        if (!jwtUtil.validateToken(token)) {
+            return "redirect:/";
+        }
         return "board/postWrite";
     }
 
