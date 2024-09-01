@@ -3,6 +3,8 @@ package com.example.baseball.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 public class PostDto {
 
     @Data
@@ -30,5 +32,13 @@ public class PostDto {
         private String content;
         private String authorNickname;
         private String teamName;
+        private String createDate;
+    }
+
+    @Data
+    public static class SelectPostRequestDto {
+        private String searchText = "";
+        private int page = 0;
+        private int size = 10;
     }
 }

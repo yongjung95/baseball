@@ -4,6 +4,7 @@ import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.TeamRepository;
 import com.example.baseball.response.error.ApiException;
+import com.example.baseball.util.JwtUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ class MemberServiceTest {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Test
     void 회원_생성() throws Exception {
@@ -82,11 +86,11 @@ class MemberServiceTest {
         dto.setEmail("yongjung95@gmail.com");
         dto.setPassword("1234");
 
-        MemberDto.ResponseMemberDto result = memberService.login(dto);
 
         //then
+        String jwtToken = memberService.login(dto);
 
-        assertThat(result.getNickname()).isEqualTo("정이");
+        assertThat(jwtUtil.getMemberId(jwtToken)).isEqualTo("정이");
     }
 
     @Test

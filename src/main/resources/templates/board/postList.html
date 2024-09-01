@@ -12,42 +12,41 @@
         </div>
         <table class="table table-hover board-table">
             <thead class="thead-light">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">제목</th>
-                <th scope="col">작성자</th>
-                <th scope="col">작성일</th>
-                <th scope="col">조회수</th>
+            <tr style="text-align: center;">
+                <th scope="col" style="width: 70%;">제목</th>
+                <th scope="col" style="width: 15%;">글쓴이</th>
+                <th scope="col" style="width: 15%;">작성일</th>
+<!--                <th scope="col">조회수</th>-->
             </tr>
             </thead>
             <tbody>
-            <tr th:each="post, stat : ${posts}">
-                <th scope="row" th:text="${stat.index + 1}">1</th>
+            <tr th:each="post, stat : ${postList.getContent()}">
                 <td class="text-left">
-                    <a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}">게시물 제목</a>
+                    <a th:href="@{/post/{postId}(id=${post.getPostId()})}" th:text="${post.getTitle()}">게시물 제목</a>
                 </td>
-                <td th:text="${post.author}">작성자</td>
-                <td th:text="${#dates.format(post.createdAt, 'yyyy-MM-dd')}">작성일</td>
-                <td th:text="${post.views}">123</td>
+                <td th:text="${post.getAuthorNickname()}">작성자</td>
+                <td th:text="${post.getCreateDate()}">작성일</td>
+<!--                <td th:text="${post..views}">123</td>-->
             </tr>
             </tbody>
         </table>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation"
+             th:with="start=${(postList.getPageable().getPageNumber() / 10) * 10 + 1},
+                  end=(${(postList.getTotalPages() == 0) ? 1 : (start + (10 - 1) < postList.getTotalPages() ? start + (10 - 1) : postList.getTotalPages())})">
             <ul class="pagination justify-content-center">
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
+                <li th:attr="class=${postList.getPageable().getPageNumber() < 10 ? 'page-item disabled' : 'page-item'}">
+                    <a class="page-link" th:href="@{/board/{symbol}(symbol=${symbol}, page = ${start - 10})}">Previous</a>
                 </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
+                <li th:each="page, status : ${#numbers.sequence(start, end)}"
+                    th:attr="class=${postList.getPageable().getPageNumber() == page -1 ? 'page-item active' :'page-item'}">
+                    <a class="page-link"
+                       th:href="@{/board/{symbol}(symbol=${symbol}, page = ${page - 1})} "
+                       th:text="${page}"></a>
+                </li>
+                <li th:attr="class=${end < postList.getTotalPages() ? 'page-item' : 'page-item disabled'}">
+                    <a class="page-link" th:href="@{/board/{symbol}(symbol=${symbol}, page = ${start + 10})}">Next</a>
                 </li>
             </ul>
         </nav>

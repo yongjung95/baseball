@@ -10,7 +10,15 @@ import com.example.baseball.response.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,5 +92,41 @@ public class PostService {
         result.setTeamName(post.getFollowedTeam().getTeamName());
 
         return result;
+    }
+
+    public Page<PostDto.ResponsePostDto> selectPostList(String searchText, String teamId, Pageable pageable) {
+        Page<Post> postList = postRepository.selectPostListByTeam(searchText, teamId, pageable);
+
+        List<PostDto.ResponsePostDto> result = postList.stream().map(this::convertToDto)
+                .toList();
+        return new PageImpl<>(result, pageable, postList.getTotalElements());
+    }
+
+    private PostDto.ResponsePostDto convertToDto(Post post) {
+        PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
+        responsePostDto.setAuthorNickname(post.getAuthor().getNickname());
+        responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
+        responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
+        return responsePostDto;
+    }
+
+    private String formatTimeAgo(LocalDateTime dateTime) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(dateTime, now);
+
+        long seconds = duration.getSeconds();
+
+        if (seconds < 60) {
+            return "방금 전";
+        } else if (seconds < 3600) {
+            long minutes = seconds / 60;
+            return minutes + "분 전";
+        } else if (seconds < 86400) { // 24 * 60 * 60
+            long hours = seconds / 3600;
+            return hours + "시간 전";
+        } else {
+            long days = seconds / 86400;
+            return days + "일 전";
+        }
     }
 }
