@@ -8,6 +8,7 @@ import com.example.baseball.repository.PostRepository;
 import com.example.baseball.response.error.ApiException;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,5 +257,87 @@ class PostServiceTest {
 
         //then
         assertThat(resultDto.getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    void 게시물_좋아요() throws Exception {
+        //given
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+        entityManager.persist(team);
+
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member);
+
+        Member member1 = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@naver.com")
+                .nickname("랜더스팬")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member1);
+
+        Post post = Post.builder()
+                .title("게시글 테스트")
+                .content("내용")
+                .author(member)
+                .followedTeam(team)
+                .build();
+
+        entityManager.persist(post);
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        boolean result = postService.savePostLike(member1.getMemberId(), post.getPostId());
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void 게시물_좋아요_본인은_불가() throws Exception {
+        //given
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+        entityManager.persist(team);
+
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member);
+
+        Post post = Post.builder()
+                .title("게시글 테스트")
+                .content("내용")
+                .author(member)
+                .followedTeam(team)
+                .build();
+
+        entityManager.persist(post);
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        String memberId = member.getMemberId();
+        Long postId = post.getPostId();
+
+        //then
+        Assertions.assertThatThrownBy(() -> postService.savePostLike(memberId, postId)).isInstanceOf(ApiException.class);
     }
 }

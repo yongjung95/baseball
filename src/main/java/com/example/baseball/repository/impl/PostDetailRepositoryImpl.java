@@ -1,6 +1,7 @@
 package com.example.baseball.repository.impl;
 
 import com.example.baseball.domain.Post;
+import com.example.baseball.domain.QPostLike;
 import com.example.baseball.repository.PostDetailRepository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static com.example.baseball.domain.QMember.member;
 import static com.example.baseball.domain.QPost.post;
+import static com.example.baseball.domain.QPostLike.postLike;
 import static com.example.baseball.domain.QTeam.team;
 
 public class PostDetailRepositoryImpl implements PostDetailRepository {
@@ -30,10 +32,9 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
     public Page<Post> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
         List<Post> results = queryFactory.select(post)
                 .from(post)
-                .join(post.author, member)
-                .fetchJoin()
-                .join(post.followedTeam, team)
-                .fetchJoin()
+                .join(post.author, member).fetchJoin()
+                .join(post.followedTeam, team).fetchJoin()
+                .leftJoin(post.postLikes, postLike).fetchJoin()
                 .where(post.followedTeam.teamId.eq(teamId)
                         .and(post.isUse.isTrue())
                         .and(post.title.contains(searchText)))
@@ -57,6 +58,7 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
                 .from(post)
                 .join(post.author, member).fetchJoin()
                 .join(post.followedTeam, team).fetchJoin()
+                .leftJoin(post.postLikes, postLike).fetchJoin()
                 .where(post.postId.eq(postId)
                         .and(post.isUse.isTrue()))
                 .fetchOne();

@@ -13,10 +13,10 @@
         <table class="table table-hover board-table">
             <thead class="thead-light">
             <tr style="text-align: center;">
-                <th scope="col" style="width: 70%;">제목</th>
+                <th scope="col" style="width: 65%;">제목</th>
                 <th scope="col" style="width: 15%;">글쓴이</th>
-                <th scope="col" style="width: 15%;">작성일</th>
-<!--                <th scope="col">조회수</th>-->
+                <th scope="col" style="width: 10%;">추천 수</th>
+                <th scope="col" style="width: 10%;">작성일</th>
             </tr>
             </thead>
             <tbody>
@@ -25,8 +25,8 @@
                     <a th:href="@{/board/post/{postId}(postId=${post.getPostId()})}" th:text="${post.getTitle()}">게시물 제목</a>
                 </td>
                 <td th:text="${post.getAuthorNickname()}">작성자</td>
+                <td th:text="${post.getLikeCnt()}">123</td>
                 <td th:text="${post.getCreateDate()}">작성일</td>
-<!--                <td th:text="${post..views}">123</td>-->
             </tr>
             </tbody>
         </table>

@@ -35,6 +35,8 @@ public class PostDto {
         private String teamName;
         private String symbol;
         private String createDate;
+        private Integer likeCnt;
+        private Integer viewCnt;
     }
 
     @Data

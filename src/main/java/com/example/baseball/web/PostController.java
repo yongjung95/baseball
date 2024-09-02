@@ -22,7 +22,7 @@ public class PostController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/post")
-    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
+    public SingleResult<?> post(@CookieValue(value = "token") String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
         if (bindResult.hasErrors()) {
             for (ObjectError allError : bindResult.getAllErrors()) {
                 return responseService.getFailParameter(allError.getDefaultMessage());
@@ -36,7 +36,7 @@ public class PostController {
     }
 
     @PostMapping("/post/{postId}")
-    public SingleResult<?> post(@CookieValue(value = "token", required = false) String token,
+    public SingleResult<?> post(@CookieValue(value = "token") String token,
                                 @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
         if (postId == null || postId <= 0) {
             return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
@@ -51,5 +51,21 @@ public class PostController {
         }
 
         return responseService.getSingleResult(postService.updatePost(dto));
+    }
+
+    @PostMapping("/post/{postId}/like")
+    public SingleResult<?> post(@CookieValue(value = "token") String token,
+                                @PathVariable("postId") Long postId) {
+        if (postId == null || postId <= 0) {
+            return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
+        }
+
+        String memberId = jwtUtil.getMemberId(token);
+
+        if (postService.savePostLike(memberId, postId)) {
+            return responseService.getSuccessResult();
+        } else {
+            return responseService.getFailResult(ErrorCode.CAN_NOT_POST_LIKE);
+        }
     }
 }

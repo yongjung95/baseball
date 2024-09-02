@@ -2,8 +2,10 @@ package com.example.baseball.service;
 
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
+import com.example.baseball.domain.PostLike;
 import com.example.baseball.dto.PostDto;
 import com.example.baseball.repository.MemberRepository;
+import com.example.baseball.repository.PostLikeRepository;
 import com.example.baseball.repository.PostRepository;
 import com.example.baseball.response.error.ApiException;
 import com.example.baseball.response.error.ErrorCode;
@@ -18,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
     private final ModelMapper modelMapper;
 
     public PostDto.ResponsePostDto savePost(PostDto.SavePostRequestDto dto) {
@@ -109,8 +111,41 @@ public class PostService {
             return null;
         }
 
+        post.updateViewCnt();
+
         return convertToDto(post);
     }
+
+    public boolean savePostLike(String memberId, Long postId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        Post post = postRepository.findByPostId(postId);
+        if (post == null) {
+            throw new ApiException(ErrorCode.POST_IS_NOT_FOUND);
+        }
+
+        PostLike postlike = postLikeRepository.findByMemberAndPost(member, post);
+
+        if (postlike != null) {
+            throw new ApiException(ErrorCode.CAN_NOT_POST_LIKE);
+        }
+
+        if (post.getAuthor().getMemberId().equals(memberId)) {
+            throw new ApiException(ErrorCode.CAN_NOT_POST_LIKE);
+        }
+
+        PostLike postLike = PostLike.builder()
+                .member(member)
+                .post(post)
+                .build();
+        postLikeRepository.save(postLike);
+
+        return true;
+    }
+
 
     private PostDto.ResponsePostDto convertToDto(Post post) {
         PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
@@ -119,6 +154,7 @@ public class PostService {
         responsePostDto.setSymbol(post.getFollowedTeam().getSymbol());
         responsePostDto.setAuthorId(post.getAuthor().getMemberId());
         responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
+        responsePostDto.setLikeCnt(post.getPostLikes().size());
         return responsePostDto;
     }
 

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -32,6 +34,12 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "team_id")
     private Team followedTeam;
 
+    @OneToMany(mappedBy = "post")
+    private List<PostLike> postLikes;
+
+    @Builder.Default
+    private Integer viewCnt = 0;
+
     public void changeIsUse() {
         this.isUse = false;
     }
@@ -43,5 +51,9 @@ public class Post extends BaseTimeEntity {
         if (content != null && !content.isEmpty()) {
             this.content = content;
         }
+    }
+
+    public void updateViewCnt() {
+        this.viewCnt = this.viewCnt + 1;
     }
 }

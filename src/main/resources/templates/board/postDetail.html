@@ -18,6 +18,12 @@
         <hr>
         <div th:text="${post.content}">게시글 내용</div>
         <hr>
+        <div class="text-center mt-4">
+            <button id="postLike" type="button" class="btn btn-primary">
+                <i class="fas fa-thumbs-up"></i> 좋아요
+            </button>
+            <span id="likeCnt" class="badge badge-pill badge-primary ml-2" th:value="${post.likeCnt}" th:text="${post.likeCnt}">0</span>
+        </div>
 
         <!--        <h3>댓글</h3>-->
         <!--        <div class="comment-section" >-->
@@ -75,6 +81,30 @@
                     }
                 });
             }
+        });
+
+        $('#postLike').on('click', function (event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            var postId = $('#postId').val();
+            var likeCnt = $('#likeCnt').val();
+
+            $.ajax({
+                url: '/post/' + postId + '/like', // 여기에 게시글 ID 추가
+                type: 'POST',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.code === "200") {
+                        alert('추천 되었습니다.');
+                        document.getElementById('likeCnt').innerText = likeCnt + 1;
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('댓글 작성 중 오류가 발생했습니다.');
+                }
+            });
         });
     });
 </script>
