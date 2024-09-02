@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -33,11 +34,14 @@ class MemberServiceTest {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Test
     void 회원_생성() throws Exception {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
-        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setEmail("yongjung95@naver.com");
         requestDto.setPassword("1234");
         requestDto.setNickname("정이");
 
@@ -197,7 +201,7 @@ class MemberServiceTest {
                 .memberId(UUID.randomUUID().toString())
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
-                .password("123456")
+                .password(bCryptPasswordEncoder.encode("123456"))
                 .lastLoginDate(LocalDateTime.now())
                 .build();
         entityManager.persist(member);
@@ -216,7 +220,7 @@ class MemberServiceTest {
                 .memberId(UUID.randomUUID().toString())
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
-                .password("123456")
+                .password(bCryptPasswordEncoder.encode("123456"))
                 .lastLoginDate(LocalDateTime.now())
                 .build();
         entityManager.persist(member);
@@ -242,7 +246,7 @@ class MemberServiceTest {
                 .memberId(UUID.randomUUID().toString())
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
-                .password("123456")
+                .password(bCryptPasswordEncoder.encode("123456"))
                 .lastLoginDate(LocalDateTime.now())
                 .build();
         entityManager.persist(member);
@@ -274,7 +278,7 @@ class MemberServiceTest {
                 .memberId(UUID.randomUUID().toString())
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
-                .password("123456")
+                .password(bCryptPasswordEncoder.encode("123456"))
                 .lastLoginDate(LocalDateTime.now())
                 .build();
         entityManager.persist(member);

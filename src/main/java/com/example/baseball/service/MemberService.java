@@ -11,6 +11,7 @@ import com.example.baseball.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +27,7 @@ public class MemberService {
     private final TeamRepository teamRepository;
     private final ModelMapper modelMapper;
     private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public MemberDto.ResponseMemberDto saveMember(MemberDto.SaveMemberRequestDto dto) {
         Team findTeam = null;
@@ -42,7 +44,7 @@ public class MemberService {
                 .memberId(UUID.randomUUID().toString())
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
-                .password(dto.getPassword())
+                .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                 .followedTeam(findTeam)
                 .build();
 
@@ -68,11 +70,11 @@ public class MemberService {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
-        if (!findMember.getPassword().equals(dto.getOldPassword())) {
+        if (!bCryptPasswordEncoder.matches(dto.getOldPassword(), findMember.getPassword())) {
             throw new ApiException(ErrorCode.PASSWORD_IS_NOT_MATCHED);
         }
 
-        findMember.updatePassword(dto.getNewPassword());
+        findMember.updatePassword(bCryptPasswordEncoder.encode(dto.getNewPassword()));
 
         return convertToDto(findMember);
     }
@@ -88,7 +90,7 @@ public class MemberService {
 
     public String login(MemberDto.LoginMemberRequestDto dto) {
         Member findMember = memberRepository.findByEmail(dto.getEmail());
-        if (findMember == null || !findMember.getPassword().equals(dto.getPassword())) {
+        if (findMember == null || !bCryptPasswordEncoder.matches(dto.getPassword(), findMember.getPassword())) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
@@ -127,8 +129,8 @@ public class MemberService {
     private MemberDto.ResponseMemberDto convertToDto(Member findMember) {
         MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
         result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
-        result.setCreatedDate(findMember.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        result.setLastLoginDate(findMember.getLastLoginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        result.setCreatedDate(findMember.getCreatedDate() == null ? null : findMember.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        result.setLastLoginDate(findMember.getCreatedDate() == null ? null : findMember.getLastLoginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         return result;
     }
 }
