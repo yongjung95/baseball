@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">회원 정보 수정</h2>
+    <div class="card">
+        <div class="card-body">
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="email">이메일:</label>
+                    <input type="email" class="form-control" id="email" name="email" th:value="${member.getEmail()}"
+                           disabled>
+                </div>
+                <div class="form-group">
+                    <label for="nickname">닉네임:</label>
+                    <input type="text" class="form-control" id="nickname" name="nickname"
+                           th:value="${member.getNickname()}" required>
+                </div>
+                <div class="form-group">
+                    <label for="createdAt">가입일:</label>
+                    <input type="text" class="form-control" id="createdAt" name="createdAt"
+                           th:value="${member.getCreatedDate()}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="lastLogin">최근 로그인:</label>
+                    <input type="text" class="form-control" id="lastLogin" name="lastLogin"
+                           th:value="${member.getLastLoginDate()}" disabled>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary mr-2">저장하기</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelEdit()">취소</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#editForm').on('submit', function (event) {
+        event.preventDefault();
+
+        if (confirm('등록 하시겠습니까?')) {
+            // 닉네임 값을 가져옴
+            var nickname = $('#nickname').val();
+
+            // AJAX 요청을 통해 닉네임 수정 처리 (서버로 데이터 전송)
+            $.ajax({
+                url: '/member/edit',
+                type: 'POST',
+                contentType: 'application/json', // JSON 형식으로 데이터 전송
+                data: JSON.stringify({ // JSON 형태로 데이터 변환
+                    nickname: nickname
+                }),
+                success: function (response) {
+                    if (response.status === 200) {
+                        alert('저장되었습니다.');
+                        location.replace("/member/detail");
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('에러 발생');
+                }
+            });
+        }
+
+
+    });
+
+    function cancelEdit() {
+        window.history.back(); // 이전 페이지로 돌아감
+    }
+
+</script>
+
+</body>
+</html>

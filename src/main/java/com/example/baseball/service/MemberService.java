@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
@@ -47,10 +48,42 @@ public class MemberService {
 
         memberRepository.save(member);
 
-        MemberDto.ResponseMemberDto result = modelMapper.map(member, MemberDto.ResponseMemberDto.class);
-        result.setTeamName(member.getFollowedTeam() == null ? null : member.getFollowedTeam().getTeamName());
+        return convertToDto(member);
+    }
 
-        return result;
+    public MemberDto.ResponseMemberDto updateMember(MemberDto.UpdateMemberRequestDto dto) {
+        Member findMember = memberRepository.findByMemberId(dto.getMemberId());
+        if (findMember == null) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        findMember.updateNickname(dto.getNickname());
+
+        return convertToDto(findMember);
+    }
+
+    public MemberDto.ResponseMemberDto updatePassword(MemberDto.UpdatePasswordRequestDto dto) {
+        Member findMember = memberRepository.findByMemberId(dto.getMemberId());
+        if (findMember == null) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        if (!findMember.getPassword().equals(dto.getOldPassword())) {
+            throw new ApiException(ErrorCode.PASSWORD_IS_NOT_MATCHED);
+        }
+
+        findMember.updatePassword(dto.getNewPassword());
+
+        return convertToDto(findMember);
+    }
+
+    public void deleteMember(String memberId) {
+        Member findMember = memberRepository.findByMemberId(memberId);
+        if (findMember == null) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        findMember.deleteMember();
     }
 
     public String login(MemberDto.LoginMemberRequestDto dto) {
@@ -59,10 +92,20 @@ public class MemberService {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
-        MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
-        result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
+        findMember.updateLastLoginDate();
+
+        MemberDto.ResponseMemberDto result = convertToDto(findMember);
 
         return jwtUtil.createAccessToken(result);
+    }
+
+    public MemberDto.ResponseMemberDto selectMemberByMemberId(String memberId) {
+        Member findMember = memberRepository.findByMemberId(memberId);
+        if (findMember == null) {
+            throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
+        }
+
+        return convertToDto(findMember);
     }
 
     public boolean checkEmail(String email) {
@@ -79,5 +122,13 @@ public class MemberService {
             throw new ApiException(ErrorCode.NICKNAME_IS_DUPLICATE);
         }
         return true;
+    }
+
+    private MemberDto.ResponseMemberDto convertToDto(Member findMember) {
+        MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
+        result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
+        result.setCreatedDate(findMember.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        result.setLastLoginDate(findMember.getLastLoginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        return result;
     }
 }

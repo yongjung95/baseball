@@ -5,6 +5,7 @@ import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.model.SingleResult;
 import com.example.baseball.response.service.ResponseService;
 import com.example.baseball.service.MemberService;
+import com.example.baseball.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -23,6 +25,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final ResponseService responseService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/member")
     public SingleResult<?> member(@RequestBody @Valid MemberDto.SaveMemberRequestDto dto, BindingResult bindResult) {
@@ -32,6 +35,53 @@ public class MemberController {
             }
         }
         return responseService.getSingleResult(memberService.saveMember(dto));
+    }
+
+    @PostMapping("/member/edit")
+    public SingleResult<?> memberEdit(@CookieValue(value = "token") String token,
+                                      @RequestBody @Valid MemberDto.UpdateMemberRequestDto dto,
+                                      BindingResult bindResult) {
+        if (bindResult.hasErrors()) {
+            for (ObjectError allError : bindResult.getAllErrors()) {
+                return responseService.getFailParameter(allError.getDefaultMessage());
+            }
+        }
+
+        String memberId = jwtUtil.getMemberId(token);
+        dto.setMemberId(memberId);
+
+        return responseService.getSingleResult(memberService.updateMember(dto));
+    }
+
+    @DeleteMapping("/member")
+    public SingleResult<?> member(@CookieValue(value = "token") String token, HttpServletResponse response) throws IOException {
+        String memberId = jwtUtil.getMemberId(token);
+        memberService.deleteMember(memberId);
+
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return responseService.getSuccessResult();
+    }
+
+    @PostMapping("/member/password")
+    public SingleResult<?> memberPassword(@CookieValue(value = "token") String token,
+                                          @RequestBody @Valid MemberDto.UpdatePasswordRequestDto dto,
+                                          BindingResult bindResult) {
+        if (bindResult.hasErrors()) {
+            for (ObjectError allError : bindResult.getAllErrors()) {
+                return responseService.getFailParameter(allError.getDefaultMessage());
+            }
+        }
+
+        String memberId = jwtUtil.getMemberId(token);
+        dto.setMemberId(memberId);
+
+        return responseService.getSingleResult(memberService.updatePassword(dto));
     }
 
     @PostMapping("/login")

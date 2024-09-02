@@ -11,6 +11,7 @@ public enum ErrorCode {
     MEMBER_IS_NOT_FOUND(403, "M001", "회원 정보가 없습니다."),
     EMAIL_IS_DUPLICATE(403, "M002", "이미 등록된 이메일입니다."),
     NICKNAME_IS_DUPLICATE(403, "M003", "이미 등록된 닉네임입니다."),
+    PASSWORD_IS_NOT_MATCHED(400, "M004", "기존 패스워드가 일치 하지 않습니다."),
 
     // 팀 관련
     TEAM_IS_NOT_FOUND(403, "T001", "팀 정보가 없습니다."),

@@ -17,11 +17,29 @@ public class MemberDto {
     }
 
     @Data
+    public static class UpdateMemberRequestDto {
+        private String memberId;
+        @NotBlank(message = "닉네임을 입력해주세요.")
+        private String nickname;
+    }
+
+    @Data
+    public static class UpdatePasswordRequestDto {
+        private String memberId;
+        @NotBlank(message = "기존 패스워드를 입력해주세요.")
+        private String oldPassword;
+        @NotBlank(message = "새로운 패스워드를 입력해주세요.")
+        private String newPassword;
+    }
+
+    @Data
     public static class ResponseMemberDto {
         private String memberId;
         private String email;
         private String nickname;
         private String teamName;
+        private String createdDate;
+        private String lastLoginDate;
     }
 
     @Data

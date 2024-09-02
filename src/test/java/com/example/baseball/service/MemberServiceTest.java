@@ -1,14 +1,20 @@
 package com.example.baseball.service;
 
+import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.TeamRepository;
 import com.example.baseball.response.error.ApiException;
 import com.example.baseball.util.JwtUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +26,9 @@ class MemberServiceTest {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -178,6 +187,106 @@ class MemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(() -> memberService.checkNickname(nickname)).isInstanceOf(ApiException.class);
+    }
 
+    @Test
+    @Transactional
+    void 회원_조회() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+        //when
+        MemberDto.ResponseMemberDto result = memberService.selectMemberByMemberId(member.getMemberId());
+
+        //then
+        assertThat(result.getNickname()).isEqualTo(member.getNickname());
+    }
+
+    @Test
+    @Transactional
+    void 회원_수정() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+
+        entityManager.flush();
+        entityManager.clear();
+        //when
+
+        MemberDto.UpdateMemberRequestDto dto = new MemberDto.UpdateMemberRequestDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setNickname("정이2");
+        MemberDto.ResponseMemberDto result = memberService.updateMember(dto);
+
+        //then
+        assertThat(result.getNickname()).isEqualTo("정이2");
+    }
+
+    @Test
+    @Transactional
+    void 회원_패스워드_변경() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+
+        entityManager.flush();
+        entityManager.clear();
+        //when
+
+        MemberDto.UpdatePasswordRequestDto dto = new MemberDto.UpdatePasswordRequestDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setOldPassword("123456");
+        dto.setNewPassword("1234");
+        MemberDto.ResponseMemberDto result = memberService.updatePassword(dto);
+
+        //then
+        MemberDto.LoginMemberRequestDto dto2 = new MemberDto.LoginMemberRequestDto();
+        dto2.setEmail("yongjung95@gmail.com");
+        dto2.setPassword("1234");
+
+        Member findMember = entityManager.find(Member.class, member.getMemberId());
+        assertThat(findMember.getNickname()).isEqualTo(member.getNickname());
+    }
+
+    @Test
+    @Transactional
+    void 회원_탈퇴() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        memberService.deleteMember(member.getMemberId());
+
+        Member findMember = entityManager.find(Member.class, member.getMemberId());
+        //then
+        assertThat(findMember.isUse()).isFalse();
     }
 }

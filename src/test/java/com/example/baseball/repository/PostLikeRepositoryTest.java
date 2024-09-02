@@ -49,9 +49,6 @@ class PostLikeRepositoryTest {
 
         entityManager.persist(post);
 
-        String teamId = team.getTeamId();
-
-
         //when
         PostLike postLike = PostLike.builder()
                 .member(member)

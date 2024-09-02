@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">회원 정보 보기</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">기본 정보</h5>
+            <form>
+                <div class="form-group">
+                    <label for="email">이메일:</label>
+                    <input type="email" class="form-control" id="email" name="email" th:value="${member.getEmail()}"
+                           disabled>
+                </div>
+                <div class="form-group">
+                    <label for="nickname">닉네임:</label>
+                    <input type="text" class="form-control" id="nickname" name="nickname"
+                           th:value="${member.getNickname()}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="team">응원팀:</label>
+                    <input type="text" class="form-control" id="team" name="team" th:value="${member.getTeamName()}"
+                           disabled>
+                </div>
+            </form>
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-primary mr-2" onclick="editProfile()">회원 정보 수정</button>
+                <button type="button" class="btn btn-secondary mr-2" onclick="changePassword()">비밀번호 변경</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">탈퇴하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function editProfile() {
+        // 프로필 수정 페이지로 이동
+        window.location.href = '/member/edit';
+    }
+
+    function changePassword() {
+        window.location.href = '/member/password';
+    }
+
+    function confirmDelete() {
+        if (confirm('정말로 탈퇴하시겠습니까?')) {
+            // AJAX 요청 보내기
+            $.ajax({
+                url: '/member', // 패스워드 변경 요청 URL
+                type: 'DELETE',
+                success: function (response) {
+                    if (response.code === "200") {
+                        alert('탈퇴되었습니다.');
+                        location.replace("/");
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('탈퇴에 실패했습니다.');
+                }
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
