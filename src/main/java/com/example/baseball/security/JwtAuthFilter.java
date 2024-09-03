@@ -1,6 +1,5 @@
 package com.example.baseball.security;
 
-import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.service.ResponseService;
 import com.example.baseball.service.CustomUserDetailsService;
 import com.example.baseball.util.JwtUtil;
@@ -20,14 +19,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper;
-    private final ResponseService responseService;
 
     @Override
     /**
@@ -35,6 +33,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getCookieValue(request, "token"); // 쿠키에서 JWT 토큰 조회
+
+        if (Arrays.stream(SecurityConstants.AUTH_WHITELIST).anyMatch(request.getRequestURI()::startsWith)) {
+            filterChain.doFilter(request, response); // 다음 필터로 넘김
+            return; // 현재 필터의 로직을 종료
+        }
 
         //JWT가 헤더에 있는 경우
         if (StringUtils.hasText(token)) {

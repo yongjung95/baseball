@@ -26,13 +26,6 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-    private final ObjectMapper objectMapper;
-    private final ResponseService responseService;
-
-    private static final String[] AUTH_WHITELIST = {
-            "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "/check-email", "/check-nickname",
-            "/board/**", "/h2-console/**"
-    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ApplicationContext context) throws Exception {
@@ -50,14 +43,14 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         //JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
-        http.addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil, objectMapper, responseService), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.exceptionHandling((exceptionHandling) -> exceptionHandling
                 .authenticationEntryPoint(authenticationEntryPoint)
         );
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(AUTH_WHITELIST).permitAll()
+                .requestMatchers(SecurityConstants.AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated());
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // h2-console iframe 허용
         http.logout(logout -> logout.deleteCookies("token")
