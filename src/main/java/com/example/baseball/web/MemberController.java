@@ -96,6 +96,15 @@ public class MemberController {
         return responseService.getSuccessResult();
     }
 
+    @PostMapping("/check-id")
+    public SingleResult<?> checkId(@RequestBody MemberDto.CheckIdRequestDto dto) {
+        String id = dto.getId();
+        if (!StringUtils.hasText(id)) {
+            return responseService.getFailResult(ErrorCode.PARAMETER_IS_EMPTY);
+        }
+        return responseService.getSingleResult(memberService.checkId(id));
+    }
+
     @PostMapping("/check-email")
     public SingleResult<?> checkEmail(@RequestBody MemberDto.CheckEmailRequestDto dto) {
         String email = dto.getEmail();

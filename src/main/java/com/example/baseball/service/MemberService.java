@@ -42,6 +42,7 @@ public class MemberService {
 
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id(dto.getId())
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
@@ -89,7 +90,7 @@ public class MemberService {
     }
 
     public String login(MemberDto.LoginMemberRequestDto dto) {
-        Member findMember = memberRepository.findByEmail(dto.getEmail());
+        Member findMember = memberRepository.findMemberById(dto.getId());
         if (findMember == null || !bCryptPasswordEncoder.matches(dto.getPassword(), findMember.getPassword())) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
@@ -108,6 +109,14 @@ public class MemberService {
         }
 
         return convertToDto(findMember);
+    }
+
+    public boolean checkId(String id) {
+        Member findMember = memberRepository.findMemberById(id);
+        if (findMember != null) {
+            throw new ApiException(ErrorCode.ID_IS_DUPLICATE);
+        }
+        return true;
     }
 
     public boolean checkEmail(String email) {

@@ -11,6 +11,8 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     Member findByNickname(@Param("nickname") String nickname);
     @Query("select m from Member m left join fetch m.followedTeam where m.email = :email and m.isUse = true")
     Member findByEmail(@Param("email") String email);
+    @Query("select m from Member m left join fetch m.followedTeam where m.id = :id and m.isUse = true")
+    Member findMemberById(@Param("id") String id);
     @Query("select m from Member m left join fetch m.followedTeam where m.memberId = :memberId and m.isUse = true")
     Member findByMemberId(@Param("memberId") String memberId);
 }

@@ -7,6 +7,8 @@ public class MemberDto {
 
     @Data
     public static class SaveMemberRequestDto {
+        @NotBlank(message = "아이디를 입력해주세요.")
+        private String id;
         @NotBlank(message = "이메일을 입력해주세요.")
         private String email;
         @NotBlank(message = "패스워드를 입력해주세요.")
@@ -35,6 +37,7 @@ public class MemberDto {
     @Data
     public static class ResponseMemberDto {
         private String memberId;
+        private String id;
         private String email;
         private String nickname;
         private String teamName;
@@ -44,10 +47,15 @@ public class MemberDto {
 
     @Data
     public static class LoginMemberRequestDto {
-        @NotBlank(message = "이메일을 입력해주세요.")
-        private String email;
+        @NotBlank(message = "아이디를 입력해주세요.")
+        private String id;
         @NotBlank(message = "패스워드를 입력해주세요.")
         private String password;
+    }
+
+    @Data
+    public static class CheckIdRequestDto {
+        private String id;
     }
 
     @Data

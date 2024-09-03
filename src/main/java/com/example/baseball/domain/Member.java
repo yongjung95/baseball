@@ -17,6 +17,7 @@ public class Member extends BaseTimeEntity {
 
     @Id
     private String memberId;
+    private String id;
     private String email;
     private String nickname;
     private String password;

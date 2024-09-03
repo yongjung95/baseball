@@ -19,6 +19,6 @@ values ('', '', '한화 이글스', 'eb1dd93e-a7fd-4fff-a101-f5c1b9c9d2b7', 'HAN
 insert into team (description, logo, team_name, team_id, symbol)
 values ('', '', '키움 히어로즈', '46290e62-7083-428e-aa64-b2eafcd8390b', 'KIWOOM');
 
-insert into member (email, team_id, nickname, password, member_id, created_date, last_login_date, is_use)
-values ('yongjung95@gmail.com', '189381b6-33a4-49e2-9d33-0aa553298e85', '정이', '$2a$10$7qeSaspIB2ekr7kvhwXR3Oq5PijjmE3F71Q9UlmdcFa.rM3pDewhq',
+insert into member (id, email, team_id, nickname, password, member_id, created_date, last_login_date, is_use)
+values ('yongjung95','yongjung95@gmail.com', '189381b6-33a4-49e2-9d33-0aa553298e85', '정이', '$2a$10$7qeSaspIB2ekr7kvhwXR3Oq5PijjmE3F71Q9UlmdcFa.rM3pDewhq',
         '3b619aa2-d4ee-412c-86be-e4face9e3491', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE);

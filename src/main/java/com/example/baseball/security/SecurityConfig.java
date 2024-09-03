@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     public static final String[] AUTH_WHITELIST = {
-            "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "/check-email", "/check-nickname",
+            "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "check-id", "/check-email", "/check-nickname",
             "/board/**", "/h2-console/**", "/favicon.ico", "/error/**"
     };
 

@@ -41,6 +41,7 @@ class MemberServiceTest {
     void 회원_생성() throws Exception {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
+        requestDto.setId("yongjung95");
         requestDto.setEmail("yongjung95@naver.com");
         requestDto.setPassword("1234");
         requestDto.setNickname("정이");
@@ -88,29 +89,30 @@ class MemberServiceTest {
     void 로그인_성공() {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
-        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setId("yongjung95");
+        requestDto.setEmail("yongjung95@naver.com");
         requestDto.setPassword("1234");
         requestDto.setNickname("정이");
 
-        memberService.saveMember(requestDto);
+        MemberDto.ResponseMemberDto responseMemberDto = memberService.saveMember(requestDto);
 
         //when
         MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
-        dto.setEmail("yongjung95@gmail.com");
+        dto.setId("yongjung95");
         dto.setPassword("1234");
-
 
         //then
         String jwtToken = memberService.login(dto);
 
-        assertThat(jwtUtil.getMemberId(jwtToken)).isEqualTo("정이");
+        assertThat(jwtUtil.getMemberId(jwtToken)).isEqualTo(responseMemberDto.getMemberId());
     }
 
     @Test
     void 로그인_실패() {
         //given
         MemberDto.SaveMemberRequestDto requestDto = new MemberDto.SaveMemberRequestDto();
-        requestDto.setEmail("yongjung95@gmail.com");
+        requestDto.setId("yongjung95");
+        requestDto.setEmail("yongjung95@naver.com");
         requestDto.setPassword("1234");
         requestDto.setNickname("정이");
 
@@ -118,11 +120,59 @@ class MemberServiceTest {
 
         //when
         MemberDto.LoginMemberRequestDto dto = new MemberDto.LoginMemberRequestDto();
-        dto.setEmail("yongjung95@gmail.com");
+        dto.setId("yongjung95");
         dto.setPassword("1233");
 
         //then
         Assertions.assertThatThrownBy(() -> memberService.login(dto)).isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    @Transactional
+    void 아이디_중복확인() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
+                .email("yongjung95@gmail.com")
+                .password("1234")
+                .nickname("정이임")
+                .build();
+
+        //when
+        entityManager.persist(member);
+        entityManager.flush();
+        entityManager.clear();
+
+        String id = "yongjung9";
+
+        //then
+        boolean result = memberService.checkId(id);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void 아이디_중복확인_에러발생() throws Exception {
+        //given
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
+                .email("yongjung95@gmail.com")
+                .password("1234")
+                .nickname("정이임")
+                .build();
+
+        //when
+        entityManager.persist(member);
+        entityManager.flush();
+        entityManager.clear();
+
+        String id = "yongjung95";
+
+        //then
+        Assertions.assertThatThrownBy(() -> memberService.checkId(id)).isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -263,7 +313,7 @@ class MemberServiceTest {
 
         //then
         MemberDto.LoginMemberRequestDto dto2 = new MemberDto.LoginMemberRequestDto();
-        dto2.setEmail("yongjung95@gmail.com");
+        dto2.setId("yongjung95@gmail.com");
         dto2.setPassword("1234");
 
         Member findMember = entityManager.find(Member.class, member.getMemberId());

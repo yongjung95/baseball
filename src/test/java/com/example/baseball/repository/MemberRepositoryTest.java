@@ -26,6 +26,7 @@ class MemberRepositoryTest {
         //given
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
                 .email("yongjung95@gmail.com")
                 .password("1234")
                 .nickname("정이")
@@ -38,7 +39,7 @@ class MemberRepositoryTest {
         entityManager.clear();
 
         //then
-        Member findMember = memberRepository.findById(member.getMemberId()).get();
+        Member findMember = memberRepository.findMemberById(member.getId());
 
         assertThat(findMember.getEmail()).isEqualTo(member.getEmail());
     }
@@ -48,9 +49,10 @@ class MemberRepositoryTest {
         //given
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
                 .email("yongjung95@gmail.com")
                 .password("1234")
-                .nickname("정이")
+                .nickname("정이임")
                 .build();
 
         //when
@@ -60,7 +62,7 @@ class MemberRepositoryTest {
         entityManager.clear();
 
         //then
-        Member findMember = memberRepository.findByNickname("정이");
+        Member findMember = memberRepository.findByNickname("정이임");
 
         assertThat(findMember.getEmail()).isEqualTo(member.getEmail());
     }
