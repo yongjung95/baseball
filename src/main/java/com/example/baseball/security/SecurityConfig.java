@@ -27,6 +27,11 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
+    public static final String[] AUTH_WHITELIST = {
+            "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "/check-email", "/check-nickname",
+            "/board/**", "/h2-console/**", "/favicon.ico", "/error/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ApplicationContext context) throws Exception {
         // CSRF 보호 비활성화 : CSRF 토큰을 사용하지 않을 것이므로 확인하지 않도록 설정
@@ -50,7 +55,7 @@ public class SecurityConfig {
         );
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(SecurityConstants.AUTH_WHITELIST).permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated());
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // h2-console iframe 허용
         http.logout(logout -> logout.deleteCookies("token")
