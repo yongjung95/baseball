@@ -2,6 +2,7 @@ package com.example.baseball.web;
 
 import com.example.baseball.dto.PostDto;
 import com.example.baseball.dto.TeamDto;
+import com.example.baseball.response.exception.ResourceNotFoundException;
 import com.example.baseball.service.MemberService;
 import com.example.baseball.service.PostService;
 import com.example.baseball.service.TeamService;
@@ -122,7 +123,7 @@ public class IndexController {
         PostDto.ResponsePostDto responsePostDto = postService.selectPost(postId);
 
         if (responsePostDto == null) {
-            return "redirect:/";
+            throw new ResourceNotFoundException("존재 하지 않습니다.");
         }
         model.addAttribute("post", responsePostDto);
 

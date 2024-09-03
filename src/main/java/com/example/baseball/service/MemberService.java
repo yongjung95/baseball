@@ -5,7 +5,7 @@ import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.TeamRepository;
-import com.example.baseball.response.error.ApiException;
+import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.util.JwtUtil;
 import jakarta.transaction.Transactional;

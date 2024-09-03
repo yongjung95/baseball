@@ -1,5 +1,7 @@
-package com.example.baseball.response.error;
+package com.example.baseball.response.handler;
 
+import com.example.baseball.response.exception.ApiException;
+import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.model.SingleResult;
 import com.example.baseball.response.service.ResponseService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class ApiExceptionAdvice {
+public class ApiExceptionHandler {
 
     private final ResponseService responseService;
 

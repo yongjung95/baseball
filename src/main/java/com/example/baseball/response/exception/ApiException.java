@@ -1,5 +1,6 @@
-package com.example.baseball.response.error;
+package com.example.baseball.response.exception;
 
+import com.example.baseball.response.error.ErrorCode;
 import lombok.Getter;
 
 @Getter

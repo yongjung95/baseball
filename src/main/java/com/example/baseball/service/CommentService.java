@@ -8,7 +8,7 @@ import com.example.baseball.dto.CommentDto;
 import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.PostRepository;
-import com.example.baseball.response.error.ApiException;
+import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.response.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,7 @@ import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.TeamRepository;
-import com.example.baseball.response.error.ApiException;
+import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.util.JwtUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
