@@ -1,11 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: header}">
-    <style>
-        .comment-section {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
 
@@ -78,14 +73,13 @@
                     contentType: 'application/json',
                     dataType: 'json',
                     success: function (response) {
-                        // 성공 메시지 출력
-                        // $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
-                        // $('#postForm')[0].reset(); // 폼 초기화
+                        // 댓글 메시지 전송
+                        stompClient.send("/app/comment", {}, JSON.stringify(response.data));
+
                         location.replace("/board/post/" + response.data.postId);
                     },
                     error: function (xhr, status, error) {
-                        // 에러 메시지 출력
-                        $('#message').html('<div class="alert alert-danger">게시물 작성에 실패했습니다. 다시 시도해주세요.</div>');
+                        alert('댓글 작성 중 오류가 발생했습니다.');
                     }
                 });
             }
@@ -112,14 +106,13 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
-                            // 성공 메시지 출력
-                            // $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
-                            // $('#postForm')[0].reset(); // 폼 초기화
+                            // 댓글 메시지 전송
+                            stompClient.send("/app/comment", {}, JSON.stringify(response.data));
+
                             location.replace("/board/post/" + response.data.postId);
                         },
                         error: function (xhr, status, error) {
-                            // 에러 메시지 출력
-                            $('#message').html('<div class="alert alert-danger">게시물 작성에 실패했습니다. 다시 시도해주세요.</div>');
+                            alert('댓글 작성 중 오류가 발생했습니다.');
                         }
                     });
                 }
@@ -147,7 +140,7 @@
                         }
                     },
                     error: function () {
-                        alert('댓글 작성 중 오류가 발생했습니다.');
+                        alert('게시글 삭제 중 오류가 발생했습니다.');
                     }
                 });
             }
@@ -172,7 +165,7 @@
                     }
                 },
                 error: function () {
-                    alert('댓글 작성 중 오류가 발생했습니다.');
+                    alert('게시글 추천 중 오류가 발생했습니다.');
                 }
             });
         });

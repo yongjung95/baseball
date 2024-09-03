@@ -25,7 +25,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public CommentDto.ResponseCommentDto saveComment(CommentDto.SaveCommentDto dto) {
+    public CommentDto.SendTopicCommentDto saveComment(CommentDto.SaveCommentDto dto) {
         Post post = postRepository.findByPostId(dto.getPostId());
         if (post == null) {
             throw new ApiException(ErrorCode.POST_IS_NOT_FOUND);
@@ -50,7 +50,11 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return modelMapper.map(comment, CommentDto.ResponseCommentDto.class);
+        CommentDto.SendTopicCommentDto result = new CommentDto.SendTopicCommentDto();
+        result.setPostAuthorId(post.getAuthor().getMemberId());
+        result.setPostId(post.getPostId());
+
+        return result;
     }
 
     public void deleteComment(CommentDto.DeleteCommentDto dto) {

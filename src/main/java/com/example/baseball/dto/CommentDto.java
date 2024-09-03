@@ -35,6 +35,12 @@ public class CommentDto {
     }
 
     @Data
+    public static class SendTopicCommentDto {
+        private String postAuthorId;
+        private Long postId;
+    }
+
+    @Data
     public static class DeleteCommentDto {
         private String authorId;
         private Long commentId;

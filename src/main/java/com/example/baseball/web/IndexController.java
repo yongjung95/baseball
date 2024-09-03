@@ -32,12 +32,17 @@ public class IndexController {
     private final JwtUtil jwtUtil;
 
     @ModelAttribute
-    public void addCommonAttributes(Model model) {
+    public void addCommonAttributes(@CookieValue(value = "token", required = false) String token, Model model) {
         // 로그인 여부
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isLoggedIn = (authentication != null && authentication.isAuthenticated() &&
                 !(authentication instanceof AnonymousAuthenticationToken));
         model.addAttribute("isLoggedIn", isLoggedIn);
+        String memberId = null;
+        if (jwtUtil.validateToken(token)) {
+            memberId = jwtUtil.getMemberId(token);
+        }
+        model.addAttribute("memberId", memberId);
 
         // 팀 목록
         model.addAttribute("teamList", teamService.selectTeamDtoList());
