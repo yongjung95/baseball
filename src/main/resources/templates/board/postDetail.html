@@ -22,25 +22,30 @@
             <button id="postLike" type="button" class="btn btn-primary">
                 <i class="fas fa-thumbs-up"></i> 좋아요
             </button>
-            <span id="likeCnt" class="badge badge-pill badge-primary ml-2" th:value="${post.likeCnt}" th:text="${post.likeCnt}">0</span>
+            <span id="likeCnt" class="badge badge-pill badge-primary ml-2" th:value="${post.likeCnt}"
+                  th:text="${post.likeCnt}">0</span>
         </div>
 
-        <!--        <h3>댓글</h3>-->
-        <!--        <div class="comment-section" >-->
-        <!--            <div class="comment">-->
-        <!--                <p><strong >댓글 작성자</strong> <span></span></p>-->
-        <!--                <p >댓글 내용</p>-->
-        <!--                <hr>-->
-        <!--            </div>-->
-        <!--        </div>-->
-        <!---->
-        <!--        <form id="commentForm">-->
-        <!--            <div class="form-group">-->
-        <!--                <label for="commentContent">댓글 작성:</label>-->
-        <!--                <textarea class="form-control" id="commentContent" name="commentContent" rows="3" required></textarea>-->
-        <!--            </div>-->
-        <!--            <button type="submit" class="btn btn-primary">댓글 작성</button>-->
-        <!--        </form>-->
+        <!-- 댓글 섹션 -->
+        <h4 th:text="${post.commentCnt} + ' 개의 댓글'"></h4>
+        <hr>
+
+        <div class="comment-section" th:if="${post.comments.size() > 0}">
+            <div th:each="comment : ${post.comments}">
+                <div th:if="${comment.parentId == null}" class="comment">
+                    <div th:insert="~{board/commentList :: commentFragment(${comment})}"></div> <!-- 부모 댓글 표시 -->
+                </div>
+            </div>
+        </div>
+
+
+        <form id="commentForm" th:if="${isLoggedIn}">
+            <div class="form-group">
+                <label for="content">댓글 작성:</label>
+                <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">댓글 작성</button>
+        </form>
         <div th:if="${isAuthor}" class="d-flex justify-content-between mb-3">
             <div class="ml-auto">
                 <!-- 수정 버튼 -->
@@ -56,6 +61,71 @@
 
 <script>
     $(document).ready(function () {
+        $('#commentForm').on('submit', function (event) {
+            event.preventDefault(); // 폼 제출 기본 동작 방지
+
+            if (confirm('저장하시겠습니까?')) {
+                var formData = {
+                    postId: $('#postId').val(),
+                    content: $('#content').val()
+                };
+
+                // AJAX 요청
+                $.ajax({
+                    type: 'POST',
+                    url: '/comment', // 게시물 작성 처리 경로
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (response) {
+                        // 성공 메시지 출력
+                        // $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
+                        // $('#postForm')[0].reset(); // 폼 초기화
+                        location.replace("/board/post/" + response.data.postId);
+                    },
+                    error: function (xhr, status, error) {
+                        // 에러 메시지 출력
+                        $('#message').html('<div class="alert alert-danger">게시물 작성에 실패했습니다. 다시 시도해주세요.</div>');
+                    }
+                });
+            }
+        });
+
+        document.querySelectorAll('.reply-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // 기본 제출 동작 방지
+
+                if (confirm('저장하시겠습니까?')) {
+                    const parentId = this.querySelector('input[name="parentId"]').value;
+                    const content = this.querySelector('textarea[name="content"]').value;
+
+                    const data = {
+                        parentId: parentId,
+                        content: content,
+                        postId: $('#postId').val(),
+                    };
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/comment', // 게시물 작성 처리 경로
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            // 성공 메시지 출력
+                            // $('#message').html('<div class="alert alert-success">게시물이 성공적으로 작성되었습니다!</div>');
+                            // $('#postForm')[0].reset(); // 폼 초기화
+                            location.replace("/board/post/" + response.data.postId);
+                        },
+                        error: function (xhr, status, error) {
+                            // 에러 메시지 출력
+                            $('#message').html('<div class="alert alert-danger">게시물 작성에 실패했습니다. 다시 시도해주세요.</div>');
+                        }
+                    });
+                }
+            });
+        });
+
         $('#deletePost').on('click', function (event) {
             event.preventDefault(); // 기본 폼 제출 방지
 
@@ -105,6 +175,48 @@
                     alert('댓글 작성 중 오류가 발생했습니다.');
                 }
             });
+        });
+    });
+
+    <!-- JavaScript -->
+    // 답글 버튼 클릭 시 폼을 표시하는 로직
+    document.querySelectorAll('.reply-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = this.getAttribute('data-comment-id');
+            const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
+
+            // 폼이 보이지 않으면 보이게, 보이면 숨기기
+            if (replyFormContainer.style.display === 'none') {
+                replyFormContainer.style.display = 'block';
+            } else {
+                replyFormContainer.style.display = 'none';
+            }
+        });
+    });
+
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = this.getAttribute('data-comment-id');
+            const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
+
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/comment/' + commentId,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.code === "200") {
+                            alert('삭제 되었습니다.');
+                            location.reload(true);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('댓글 작성 중 오류가 발생했습니다.');
+                    }
+                });
+            }
         });
     });
 </script>

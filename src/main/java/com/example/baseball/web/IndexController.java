@@ -127,8 +127,9 @@ public class IndexController {
         model.addAttribute("post", responsePostDto);
 
         boolean isAuthor = false;
+        String memberId = null;
         if (StringUtils.hasText(token)) {
-            String memberId = jwtUtil.getMemberId(token);
+             memberId = jwtUtil.getMemberId(token);
 
             if (responsePostDto.getAuthorId().equals(memberId)) {
                 isAuthor = true;
@@ -136,6 +137,7 @@ public class IndexController {
         }
 
         model.addAttribute("isAuthor", isAuthor);
+        model.addAttribute("memberId", memberId);
         return "board/postDetail";
     }
 

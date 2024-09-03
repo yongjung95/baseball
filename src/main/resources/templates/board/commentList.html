@@ -1,0 +1,44 @@
+<!-- 댓글을 재귀적으로 출력하는 프래그먼트 -->
+<div th:fragment="commentFragment(comment)">
+    <div>
+        <div style="display: flex; justify-content: space-between;">
+            <p>
+                <strong><span th:text="${comment.authorNickname}"></span></strong>
+                <span style="margin-left: 10px; font-size: small; color: gray;" th:text="${comment.authorTeamName}"></span>
+
+                <span style="margin-left: 10px; font-size: small; color: gray;" th:text="${comment.createDate}"></span>
+            </p>
+            <div th:if="${isLoggedIn}">
+                <button th:if="${memberId == comment.authorId && comment.isUse}" class="btn btn-link delete-button" th:data-comment-id="${comment.commentId}"
+                        style="padding: 0; margin-right: 10px;">삭제
+                </button>
+                <button class="btn btn-link reply-button" th:data-comment-id="${comment.commentId}" style="padding: 0;">답글
+                </button>
+            </div>
+        </div>
+
+        <p th:if="${comment.isUse}" th:text="${comment.content}"></p>
+        <p th:if="${!comment.isUse}">삭제된 댓글입니다.</p>
+
+        <hr>
+
+        <!-- 답글 작성 폼 (초기에 숨김) -->
+        <div class="reply-form-container" th:id="'reply-form-' + ${comment.commentId}"
+             style="display: none; margin-left: 20px;">
+            <form class="reply-form" method="post">
+                <input type="hidden" name="parentId" th:value="${comment.commentId}"/> <!-- 부모 댓글 ID -->
+                <div class="form-group">
+                    <textarea class="form-control" name="content" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">작성</button>
+            </form>
+        </div>
+
+        <!-- 대댓글을 출력 -->
+        <div th:if="${comment.children != null and comment.children.size() > 0}" th:each="reply : ${comment.children}">
+            <div style="margin-left: 20px;">
+                <div th:replace="::commentFragment(${reply})"></div> <!-- 재귀 호출 -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -20,7 +20,11 @@ public enum ErrorCode {
     POST_IS_NOT_FOUND(403, "P001", "게시글 정보가 없습니다."),
     AUTHOR_IS_NOT_MATCHED(400, "P002", "작성자와 일치 하지 않습니다"),
     POST_CREATE_IS_ONLY_SELECTED_TEAM(400, "P003", "게시글은 팀을 선택했을 때만 작성 가능합니다."),
-    CAN_NOT_POST_LIKE(400, "P004", "추천을 할 수 없습니다.");
+    CAN_NOT_POST_LIKE(400, "P004", "추천을 할 수 없습니다."),
+
+    // 댓글 관련
+    COMMENT_IS_NOT_MATCHED(400, "CO001", "댓글 정보가 없습니다."),
+    COMMENT_AUTHOR_IS_NOT_MATCHED(400, "CO001", "댓글 작성자와 일치 하지 않습니다.");
 
 
     private final String code;

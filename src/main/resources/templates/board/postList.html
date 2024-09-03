@@ -23,6 +23,7 @@
             <tr th:each="post, stat : ${postList.getContent()}">
                 <td class="text-left">
                     <a th:href="@{/board/post/{postId}(postId=${post.getPostId()})}" th:text="${post.getTitle()}">게시물 제목</a>
+                    <span style="margin-left: 7px; font-size: small; color: gray;" th:text="'[' + ${post.getCommentCnt()} + ']'"></span>
                 </td>
                 <td th:text="${post.getAuthorNickname()}">작성자</td>
                 <td th:text="${post.getLikeCnt()}">123</td>

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PostDto {
 
@@ -37,6 +38,8 @@ public class PostDto {
         private String createDate;
         private Integer likeCnt;
         private Integer viewCnt;
+        private Integer commentCnt;
+        private List<CommentDto.ResponseCommentDto> comments;
     }
 
     @Data

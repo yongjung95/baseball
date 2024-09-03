@@ -1,6 +1,7 @@
 package com.example.baseball.repository.impl;
 
 import com.example.baseball.domain.Post;
+import com.example.baseball.domain.QComment;
 import com.example.baseball.domain.QPostLike;
 import com.example.baseball.repository.PostDetailRepository;
 import com.querydsl.core.types.Order;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
+import static com.example.baseball.domain.QComment.comment;
 import static com.example.baseball.domain.QMember.member;
 import static com.example.baseball.domain.QPost.post;
 import static com.example.baseball.domain.QPostLike.postLike;

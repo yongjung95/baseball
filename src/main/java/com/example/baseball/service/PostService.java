@@ -1,9 +1,12 @@
 package com.example.baseball.service;
 
+import com.example.baseball.domain.Comment;
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.PostLike;
+import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
+import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.PostLikeRepository;
 import com.example.baseball.repository.PostRepository;
@@ -12,6 +15,7 @@ import com.example.baseball.response.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +23,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +37,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
 
     public PostDto.ResponsePostDto savePost(PostDto.SavePostRequestDto dto) {
@@ -99,7 +108,7 @@ public class PostService {
     public Page<PostDto.ResponsePostDto> selectPostList(String searchText, String teamId, Pageable pageable) {
         Page<Post> postList = postRepository.selectPostListByTeam(searchText, teamId, pageable);
 
-        List<PostDto.ResponsePostDto> result = postList.stream().map(this::convertToDto)
+        List<PostDto.ResponsePostDto> result = postList.stream().map(this::convertToDtoList)
                 .toList();
         return new PageImpl<>(result, pageable, postList.getTotalElements());
     }
@@ -146,8 +155,14 @@ public class PostService {
         return true;
     }
 
-
     private PostDto.ResponsePostDto convertToDto(Post post) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addMappings(new PropertyMap<Post, PostDto.ResponsePostDto>() {
+            @Override
+            protected void configure() {
+                skip(destination.getComments());
+            }
+        });
         PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
         responsePostDto.setAuthorNickname(post.getAuthor().getNickname());
         responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
@@ -155,6 +170,42 @@ public class PostService {
         responsePostDto.setAuthorId(post.getAuthor().getMemberId());
         responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
         responsePostDto.setLikeCnt(post.getPostLikes().size());
+        List<Comment> comments = commentRepository.findCommentsByPostId(post.getPostId());
+
+        List<CommentDto.ResponseCommentDto> commentDtoList = new ArrayList<>();
+        Map<Long, CommentDto.ResponseCommentDto> map = new HashMap<>(); //상위 부모를 한번에 알기 위해서 임시로 사용하는 변수
+
+        for(Comment comment : comments) {
+            CommentDto.ResponseCommentDto commentDto = modelMapper.map(comment, CommentDto.ResponseCommentDto.class);
+            commentDto.setAuthorNickname(comment.getAuthor().getNickname());
+            commentDto.setCreateDate(formatTimeAgo(comment.getCreatedDate()));
+            commentDto.setAuthorId(comment.getAuthor().getMemberId());
+            commentDto.setAuthorTeamName(comment.getAuthor().getFollowedTeam() == null ?
+                    "미정" : comment.getAuthor().getFollowedTeam().getTeamName());
+            map.put(commentDto.getCommentId(), commentDto);
+            if(comment.getParent() != null) {
+                map.get(comment.getParent().getCommentId()).getChildren().add(commentDto);
+            }else{
+                commentDtoList.add(commentDto);
+            }
+        }
+
+        responsePostDto.setCommentCnt(comments.size());
+        responsePostDto.setComments(commentDtoList);
+
+        return responsePostDto;
+    }
+
+    private PostDto.ResponsePostDto convertToDtoList(Post post) {
+        PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
+        responsePostDto.setAuthorNickname(post.getAuthor().getNickname());
+        responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
+        responsePostDto.setSymbol(post.getFollowedTeam().getSymbol());
+        responsePostDto.setAuthorId(post.getAuthor().getMemberId());
+        responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
+        responsePostDto.setLikeCnt(post.getPostLikes().size());
+        responsePostDto.setCommentCnt(post.getComments().size());
+
         return responsePostDto;
     }
 

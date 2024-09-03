@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post")
     private List<PostLike> postLikes;
+
+    @OneToMany(mappedBy = "post")
+    @BatchSize(size = 10)
+    private List<Comment> comments;
 
     @Builder.Default
     private Integer viewCnt = 0;

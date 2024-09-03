@@ -1,9 +1,12 @@
 package com.example.baseball.service;
 
+import com.example.baseball.domain.Comment;
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.Team;
+import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
+import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.PostRepository;
 import com.example.baseball.response.error.ApiException;
 import jakarta.persistence.EntityManager;
@@ -31,6 +34,8 @@ class PostServiceTest {
     private EntityManager entityManager;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Test
     void 게시물_생성() throws Exception {
@@ -208,8 +213,15 @@ class PostServiceTest {
                 .author(member)
                 .followedTeam(team)
                 .build();
+        Post post2 = Post.builder()
+                .title("게시글 테스트2")
+                .content("내용2")
+                .author(member)
+                .followedTeam(team)
+                .build();
 
         entityManager.persist(post);
+        entityManager.persist(post2);
         entityManager.flush();
         entityManager.clear();
 
@@ -219,7 +231,7 @@ class PostServiceTest {
 
         //then
         Page<PostDto.ResponsePostDto> result = postService.selectPostList(searchText, team.getTeamId(), pageRequest);
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent().size()).isEqualTo(2);
         assertThat(result.getContent().get(0).getTeamName()).isEqualTo("SSG");
     }
 
@@ -339,5 +351,78 @@ class PostServiceTest {
 
         //then
         Assertions.assertThatThrownBy(() -> postService.savePostLike(memberId, postId)).isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    void 게시물_댓글_조회() throws Exception {
+        //given
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+        entityManager.persist(team);
+
+        Member member = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member);
+
+        Member member1 = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@naver.com")
+                .nickname("랜더스팬")
+                .password("123456")
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member1);
+
+        Post post = Post.builder()
+                .title("게시글 테스트")
+                .content("내용")
+                .author(member)
+                .followedTeam(team)
+                .build();
+        entityManager.persist(post);
+
+        Comment comment = Comment.builder()
+                .post(post)
+                .author(member)
+                .content("댓글1")
+                .parent(null)
+                .build();
+        entityManager.persist(comment);
+
+        Comment comment3 = Comment.builder()
+                .post(post)
+                .author(member)
+                .content("댓글1-1")
+                .parent(comment)
+                .build();
+        entityManager.persist(comment3);
+
+        Comment comment2 = Comment.builder()
+                .post(post)
+                .author(member)
+                .content("댓글2")
+                .parent(null)
+                .build();
+        entityManager.persist(comment2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        PostDto.ResponsePostDto result = postService.selectPost(post.getPostId());
+
+        //then
+        assertThat(result.getComments().size()).isEqualTo(2);
+
+        for (CommentDto.ResponseCommentDto resultComment : result.getComments()) {
+            System.out.println("resultComment = " + resultComment);
+        }
     }
 }
