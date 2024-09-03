@@ -51,7 +51,7 @@ public class CommentService {
         commentRepository.save(comment);
 
         CommentDto.SendTopicCommentDto result = new CommentDto.SendTopicCommentDto();
-        result.setPostAuthorId(post.getAuthor().getMemberId());
+        result.setPostAuthorId(comment.getParent() == null ? post.getAuthor().getMemberId() : comment.getParent().getAuthor().getMemberId());
         result.setPostId(post.getPostId());
 
         return result;
