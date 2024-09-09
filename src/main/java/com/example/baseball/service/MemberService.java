@@ -60,7 +60,13 @@ public class MemberService {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
         }
 
-        findMember.updateNickname(dto.getNickname());
+        if (!findMember.getNickname().equals(dto.getNickname())) {
+            Member findMemberByNickname = memberRepository.findByNickname(dto.getNickname());
+            if (findMemberByNickname != null) {
+                throw new ApiException(ErrorCode.NICKNAME_IS_DUPLICATE);
+            }
+            findMember.updateNickname(dto.getNickname());
+        }
 
         if (findMember.getFollowedTeam() == null && StringUtils.hasText(dto.getTeamId())) {
             Team findTeam = teamRepository.findByTeamId(dto.getTeamId());

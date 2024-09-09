@@ -267,6 +267,7 @@ class MemberServiceTest {
     void 회원_수정() throws Exception {
         //given
         Member member = Member.builder()
+                .id("yongjung65")
                 .memberId(UUID.randomUUID().toString())
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
@@ -286,6 +287,33 @@ class MemberServiceTest {
 
         //then
         assertThat(result.getNickname()).isEqualTo("정이2");
+    }
+
+    @Test
+    @Transactional
+    void 회원_수정_닉네임_제외() throws Exception {
+        //given
+        Member member = Member.builder()
+                .id("yongjung65")
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@gmail.com")
+                .nickname("정이")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+
+        entityManager.flush();
+        entityManager.clear();
+        //when
+
+        MemberDto.UpdateMemberRequestDto dto = new MemberDto.UpdateMemberRequestDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setNickname("정이");
+        MemberDto.ResponseMemberDto result = memberService.updateMember(dto);
+
+        //then
+        assertThat(result.getNickname()).isEqualTo("정이");
     }
 
     @Test
@@ -417,4 +445,5 @@ class MemberServiceTest {
         MemberDto.ResponseMemberDto result = memberService.updateMember(dto);
         assertThat(result.getTeamName()).isEqualTo(team.getTeamName());
     }
+
 }
