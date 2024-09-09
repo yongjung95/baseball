@@ -67,9 +67,8 @@ class CommentServiceTest {
         dto.setPostId(post.getPostId());
         dto.setContent("댓글 테스트");
         dto.setAuthorId(member.getMemberId());
-        CommentDto.ResponseCommentDto result = commentService.saveComment(dto);
-
+        CommentDto.SendTopicCommentDto result = commentService.saveComment(dto);
         //then
-        assertThat(result.getContent()).isEqualTo("댓글 테스트");
+        assertThat(result.getPostId()).isEqualTo(post.getPostId());
     }
 }

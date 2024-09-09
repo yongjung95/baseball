@@ -62,6 +62,14 @@ public class MemberService {
 
         findMember.updateNickname(dto.getNickname());
 
+        if (findMember.getFollowedTeam() == null && StringUtils.hasText(dto.getTeamId())) {
+            Team findTeam = teamRepository.findByTeamId(dto.getTeamId());
+            if (findTeam == null) {
+                throw new ApiException(ErrorCode.TEAM_IS_NOT_FOUND);
+            }
+            findMember.changeFollowedTeam(findTeam);
+        }
+
         return convertToDto(findMember);
     }
 

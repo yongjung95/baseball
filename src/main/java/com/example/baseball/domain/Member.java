@@ -44,4 +44,8 @@ public class Member extends BaseTimeEntity {
     public void deleteMember() {
         this.isUse = false;
     }
+
+    public void changeFollowedTeam(Team followedTeam) {
+        this.followedTeam = followedTeam;
+    }
 }

@@ -343,4 +343,78 @@ class MemberServiceTest {
         //then
         assertThat(findMember.isUse()).isFalse();
     }
+
+    @Test
+    @Transactional
+    void 회원_팀설정() throws Exception {
+        //given
+        Member member = Member.builder()
+                .id("yongjung65")
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@naver.com")
+                .nickname("정이2")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+        entityManager.persist(member);
+
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+
+        entityManager.persist(team);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        MemberDto.UpdateMemberRequestDto dto = new MemberDto.UpdateMemberRequestDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setTeamId(team.getTeamId());
+
+        //then
+        MemberDto.ResponseMemberDto result = memberService.updateMember(dto);
+        assertThat(result.getTeamName()).isEqualTo(team.getTeamName());
+    }
+
+    @Test
+    @Transactional
+    void 회원_팀설정_기존팀_있을_경우_변경_안됨() throws Exception {
+        //given
+        Team team = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("SSG")
+                .build();
+        entityManager.persist(team);
+
+        Team team2 = Team.builder()
+                .teamId(UUID.randomUUID().toString())
+                .teamName("LG")
+                .build();
+        entityManager.persist(team2);
+
+        Member member = Member.builder()
+                .id("yongjung65")
+                .memberId(UUID.randomUUID().toString())
+                .email("yongjung95@naver.com")
+                .nickname("정이2")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .lastLoginDate(LocalDateTime.now())
+                .followedTeam(team)
+                .build();
+        entityManager.persist(member);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        MemberDto.UpdateMemberRequestDto dto = new MemberDto.UpdateMemberRequestDto();
+        dto.setMemberId(member.getMemberId());
+        dto.setTeamId(team2.getTeamId());
+
+        //then
+        MemberDto.ResponseMemberDto result = memberService.updateMember(dto);
+        assertThat(result.getTeamName()).isEqualTo(team.getTeamName());
+    }
 }

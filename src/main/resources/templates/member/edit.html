@@ -18,11 +18,21 @@
                     <input type="text" class="form-control" id="nickname" name="nickname"
                            th:value="${member.getNickname()}" required>
                 </div>
-                <div class="form-group">
-                    <label for="createdAt">가입일:</label>
-                    <input type="text" class="form-control" id="createdAt" name="createdAt"
-                           th:value="${member.getCreatedDate()}" disabled>
+                <div class="form-group" th:if="${member.getTeamName() != null}">
+                    <label for="team">응원팀:</label>
+                    <input type="text" class="form-control" id="team" name="team" th:value="${member.getTeamName()}"
+                           disabled>
                 </div>
+                <div class="form-group" th:if="${member.getTeamName() == null}">
+                    <label for="teamId">응원팀 선택:</label>
+                    <select id="teamId" name="teamId">
+                        <option value="">-- Select a Team --</option>
+                        <option value="">미정</option>
+                        <option th:each="team : ${teamList}" th:value="${team.getTeamId()}"
+                                th:text="${team.getTeamName()}"></option> <!-- 팀 목록을 동적으로 생성 -->
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="lastLogin">최근 로그인:</label>
                     <input type="text" class="form-control" id="lastLogin" name="lastLogin"
@@ -45,6 +55,7 @@
         if (confirm('등록 하시겠습니까?')) {
             // 닉네임 값을 가져옴
             var nickname = $('#nickname').val();
+            var teamId = $('#teamId').val();
 
             // AJAX 요청을 통해 닉네임 수정 처리 (서버로 데이터 전송)
             $.ajax({
@@ -52,7 +63,8 @@
                 type: 'POST',
                 contentType: 'application/json', // JSON 형식으로 데이터 전송
                 data: JSON.stringify({ // JSON 형태로 데이터 변환
-                    nickname: nickname
+                    nickname: nickname,
+                    teamId: teamId
                 }),
                 success: function (response) {
                     if (response.status === 200) {
