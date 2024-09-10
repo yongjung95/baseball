@@ -1,12 +1,220 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: header}">
+    <title>KakaoTalk Style Chat</title>
 </head>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #e9eff1;
+        margin: 0;
+        padding: 0;
+    }
+
+    main {
+        width: 90%;
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .chat-header {
+        background: #2c3e50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+        border-top: 1px solid #ddd;
+        overflow: hidden;
+    }
+
+    .messages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: #f4f4f4;
+        display: flex; /* Flexbox 활성화 */
+        flex-direction: column; /* 세로 방향 정렬 */
+        align-items: flex-start; /* 기본적으로 왼쪽 정렬 */
+    }
+
+    .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 80%; /* 최대 너비 */
+        min-width: 50px; /* 최소 너비 */
+        word-wrap: break-word;
+        position: relative;
+    }
+
+    .sender-name {
+        font-size: 12px; /* 이름 크기 */
+        font-weight: bold; /* 이름 두껍게 */
+        margin-bottom: 5px; /* 이름과 메시지 내용 사이 여백 */
+    }
+
+    .message.user {
+        background: #f8f5a3; /* 사용자 메시지 배경색 */
+        align-self: flex-end; /* 오른쪽 정렬 */
+        margin-left: auto; /* 오른쪽으로 정렬 */
+    }
+
+    .message.bot {
+        background: #dcf8c6; /* 상대방 메시지 배경색 */
+        align-self: flex-start; /* 왼쪽 정렬 */
+        margin-right: auto; /* 왼쪽으로 정렬 */
+    }
+
+    .input-area {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        background: white;
+    }
+
+    .input-area input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        margin-right: 10px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-area button {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background: #2c3e50;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        transition: background 0.3s;
+    }
+
+    .input-area button:hover {
+        background: #2c3e50;
+    }
+</style>
 <body>
-<main>
+<main class="container">
+    <section>
+        <h2>Top 10 Posts</h2>
+        <div class="post">Post 1: This is a great post!</div>
+        <div class="post">Post 2: Another amazing post!</div>
+        <div class="post">Post 3: You should check this out!</div>
+        <div class="post">Post 4: A fantastic read!</div>
+        <div class="post">Post 5: Highly recommended!</div>
+        <div class="post">Post 6: Don't miss this one!</div>
+        <div class="post">Post 7: Very insightful!</div>
+        <div class="post">Post 8: Worth your time!</div>
+        <div class="post">Post 9: A must-read!</div>
+        <div class="post">Post 10: An interesting perspective!</div>
+    </section>
+    <section>
 
-
+    <div class="chat-header">실시간 채팅</div>
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <!-- 메시지들이 여기에 추가됩니다 -->
+        </div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message..."/>
+            <button id="sendButton"><i class="fas fa-paper-plane"></i>전송</button>
+        </div>
+    </div>
+    </section>
 </main>
 
+<script>
+    const sendButton = document.getElementById('sendButton');
+    const messageInput = document.getElementById('messageInput');
+    const messagesContainer = document.getElementById('messages');
+
+    let chatStompClient = null;
+
+    const memberId = '[[${memberId}]]';
+
+    $(document).ready(function () {
+        const chatSocket = new SockJS('/ws');
+        chatStompClient = Stomp.over(chatSocket);
+
+        chatStompClient.connect({}, function (frame) {
+            // console.log('Connected: ' + frame);
+            chatStompClient.debug = null;
+
+            chatStompClient.subscribe('/topic/chat', function (chat) {
+                const chatData = JSON.parse(chat.body);
+                if (chatData.chatAuthorId !== memberId) {
+                    addMessage(chatData.content, 'other', chatData.chatAuthorNickname); // 상대방 메시지 추가
+                }
+            });
+
+        });
+    });
+
+    // 메시지를 추가하는 함수
+    function addMessage(content, sender, senderNickname) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + (sender === 'my' ? 'user' : 'bot');
+
+        if (sender !== 'my') {
+            // 작성자의 이름을 포함하는 요소 추가
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'sender-name';
+            nameDiv.textContent = senderNickname;
+
+            messageDiv.appendChild(nameDiv); // 이름 요소 추가
+        }
+
+
+        const contentDiv = document.createElement('div');
+        contentDiv.textContent = content;
+
+        messageDiv.appendChild(contentDiv); // 내용 요소 추가
+
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight; // 스크롤을 맨 아래로
+    }
+
+    // 버튼 클릭 시 메시지 전송
+    sendButton.addEventListener('click', () => {
+        if (memberId === '') {
+            alert('로그인 후 이용 가능합니다.');
+            messageInput.value = ''; // 입력란 비우기
+            return;
+        }
+
+        const messageContent = messageInput.value.trim();
+        if (messageContent) {
+            addMessage(messageContent, 'my', ''); // 사용자 메시지 추가
+            messageInput.value = ''; // 입력란 비우기
+
+            var chatMessage = {
+                content: messageContent,
+                chatAuthorId: memberId
+            };
+
+            chatStompClient.send("/app/sendMessage", {}, JSON.stringify(chatMessage));
+        }
+    });
+
+    // 엔터키로 메시지 전송
+    messageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            sendButton.click(); // 클릭 이벤트 트리거
+        }
+    });
+</script>
 </body>
 </html>

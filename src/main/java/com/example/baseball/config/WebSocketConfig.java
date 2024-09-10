@@ -12,12 +12,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").withSockJS(); // STOMP 엔드포인트
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS(); // STOMP 엔드포인트
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic"); // 메시지 브로커 설정
-        config.setApplicationDestinationPrefixes("/app"); // 클라이언트 메시지 전송 prefix 설정
+        config.setApplicationDestinationPrefixes("/app") // 클라이언트 메시지 전송 prefix 설정
+                .enableStompBrokerRelay("/topic") // RabbitMQ 브로커 설정
+                .setRelayHost("localhost")  // RabbitMQ 서버의 호스트
+                .setRelayPort(61613)        // STOMP 포트 (기본 61613)
+                .setClientLogin("guest")    // RabbitMQ 로그인
+                .setClientPasscode("guest");
+        config.enableSimpleBroker("/comment"); // 메시지 브로커 설정 (인메모리)
+
+//        config.setApplicationDestinationPrefixes("/app");
+
     }
 }

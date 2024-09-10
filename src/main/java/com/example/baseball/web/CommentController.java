@@ -40,10 +40,8 @@ public class CommentController {
     // STOMP를 통한 댓글 알림 전송
     @MessageMapping("/comment")
     public void sendComment(@RequestBody @Valid CommentDto.SendTopicCommentDto dto) {
-        // 댓글을 데이터베이스에 저장하는 로직 (여기서는 중복될 수 있음)
-
         // 클라이언트에 알림 전송
-        messagingTemplate.convertAndSend("/topic/comments/" + dto.getPostAuthorId(), dto);
+        messagingTemplate.convertAndSend("/comment/comments/" + dto.getPostAuthorId(), dto);
     }
 
     @PostMapping("/comment/{commentId}")
