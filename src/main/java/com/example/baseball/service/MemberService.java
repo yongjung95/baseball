@@ -11,6 +11,8 @@ import com.example.baseball.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -54,6 +56,7 @@ public class MemberService {
         return convertToDto(member);
     }
 
+    @CachePut("members")
     public MemberDto.ResponseMemberDto updateMember(MemberDto.UpdateMemberRequestDto dto) {
         Member findMember = memberRepository.findByMemberId(dto.getMemberId());
         if (findMember == null) {
@@ -116,6 +119,7 @@ public class MemberService {
         return jwtUtil.createAccessToken(result);
     }
 
+    @Cacheable("members")
     public MemberDto.ResponseMemberDto selectMemberByMemberId(String memberId) {
         Member findMember = memberRepository.findByMemberId(memberId);
         if (findMember == null) {

@@ -33,6 +33,15 @@ spring:
     port: 15672
     username: guest
     password: guest
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 6000
+      repositories:
+        enabled: true
 logging:
   level:
     org:
