@@ -33,6 +33,7 @@ spring:
     port: 15672
     username: guest
     password: guest
+#    requested-heartbeat: 20
   cache:
     type: redis
   data:

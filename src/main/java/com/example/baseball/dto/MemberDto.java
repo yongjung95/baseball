@@ -42,6 +42,7 @@ public class MemberDto {
         private String email;
         private String nickname;
         private String teamName;
+        private String teamLogo;
         private String createdDate;
         private String lastLoginDate;
     }

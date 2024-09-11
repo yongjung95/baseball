@@ -16,6 +16,7 @@ public class ChatDto {
         private String chatAuthorNickname;
         private String content;
         private String teamName;
+        private String teamLogo;
     }
 
 }

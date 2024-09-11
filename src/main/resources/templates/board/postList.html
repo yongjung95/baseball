@@ -6,8 +6,11 @@
 
 <main class="container mt-5">
     <section>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 th:text="${teamName}"></h2>
+        <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 2px solid #2c3e50;">
+            <div style="display: flex; align-items: center;">
+                <img th:src="${logo}" alt="Team Logo" style="width: 80px; height: 40px; margin-right: 10px;"/>
+                <h2 th:text="${teamName}" style="margin: 0; border-bottom: none;"></h2>
+            </div>
             <a class="btn btn-primary" th:if="${isLoggedIn && isSymbolMatched}" th:href="@{/board/post}" role="button">글작성하기</a>
         </div>
         <table class="table table-hover board-table">
@@ -33,7 +36,7 @@
         </table>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation" style="font-family: TTLaundryGothicB, serif"
+        <nav aria-label="Page navigation" style="font-family: RixXladywatermelonR, serif"
              th:with="start=${(postList.getPageable().getPageNumber() / 10) * 10 + 1},
                   end=(${(postList.getTotalPages() == 0) ? 1 : (start + (10 - 1) < postList.getTotalPages() ? start + (10 - 1) : postList.getTotalPages())})">
             <ul class="pagination justify-content-center">

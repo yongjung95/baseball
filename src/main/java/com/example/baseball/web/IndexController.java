@@ -94,6 +94,8 @@ public class IndexController {
         if (StringUtils.hasText(symbol)) {
             TeamDto.SelectTeamDto dto = teamService.selectTeamBySymbol(symbol);
             model.addAttribute("symbol", dto.getSymbol());
+            model.addAttribute("logo", dto.getLogo());
+
             model.addAttribute("teamName", dto.getTeamName());
 
             PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize(), Sort.by(Sort.Direction.DESC, "createdDate"));

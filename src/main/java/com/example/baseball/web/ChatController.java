@@ -30,6 +30,7 @@ public class ChatController {
         receiveChatDto.setChatAuthorNickname(responseMemberDto.getNickname());
         receiveChatDto.setContent(dto.getContent());
         receiveChatDto.setTeamName(responseMemberDto.getTeamName());
+        receiveChatDto.setTeamLogo(responseMemberDto.getTeamLogo());
         messagingTemplate.convertAndSend("/topic/chat", receiveChatDto);
     }
 }

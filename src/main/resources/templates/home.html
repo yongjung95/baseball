@@ -42,37 +42,56 @@
         padding: 10px;
         overflow-y: auto;
         background: #f4f4f4;
-        display: flex; /* Flexbox 활성화 */
-        flex-direction: column; /* 세로 방향 정렬 */
-        align-items: flex-start; /* 기본적으로 왼쪽 정렬 */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message-container {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
     }
 
     .message {
-        margin-bottom: 10px;
         padding: 10px;
         border-radius: 10px;
-        max-width: 80%; /* 최대 너비 */
-        min-width: 50px; /* 최소 너비 */
+        max-width: 80%;
+        min-width: 50px;
         word-wrap: break-word;
         position: relative;
     }
 
     .sender-name {
-        font-size: 12px; /* 이름 크기 */
-        font-weight: bold; /* 이름 두껍게 */
-        margin-bottom: 5px; /* 이름과 메시지 내용 사이 여백 */
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
 
     .message.user {
-        background: #f8f5a3; /* 사용자 메시지 배경색 */
-        align-self: flex-end; /* 오른쪽 정렬 */
-        margin-left: auto; /* 오른쪽으로 정렬 */
+        background: #f8f5a3;
+        align-self: flex-end;
+        margin-left: auto;
     }
 
     .message.bot {
-        background: #dcf8c6; /* 상대방 메시지 배경색 */
-        align-self: flex-start; /* 왼쪽 정렬 */
-        margin-right: auto; /* 왼쪽으로 정렬 */
+        background: #dcf8c6;
+        align-self: flex-start;
+    }
+
+    .message-container.user {
+        justify-content: flex-end; /* 내 메시지 정렬 */
+    }
+
+    .profile-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .message-container.user .profile-image {
+        margin-left: 10px;
+        margin-right: 0;
     }
 
     .input-area {
@@ -146,44 +165,73 @@
     const memberId = '[[${memberId}]]';
 
     $(document).ready(function () {
-        const chatSocket = new SockJS('/ws');
-        chatStompClient = Stomp.over(chatSocket);
+        let isConnected = false; // 연결 상태 추적
+        const reconnectInterval = 1000; // 재연결 시도 간격 (ms)
 
-        chatStompClient.connect({}, function (frame) {
-            // console.log('Connected: ' + frame);
-            chatStompClient.debug = null;
+        function connect() {
+            if (isConnected) return; // 이미 연결되어 있으면 함수를 종료
 
-            chatStompClient.subscribe('/topic/chat', function (chat) {
-                const chatData = JSON.parse(chat.body);
-                if (chatData.chatAuthorId !== memberId) {
-                    addMessage(chatData.content, 'other', chatData.chatAuthorNickname); // 상대방 메시지 추가
-                }
-            });
+            const chatSocket = new SockJS('/ws');
+            chatStompClient = Stomp.over(chatSocket);
 
-        });
+            chatStompClient.connect({}, function (frame) {
+                // console.log('Connected: ' + frame);
+                isConnected = true; // 연결 상태 업데이트
+
+                // 하트비트 설정
+                chatStompClient.heartbeat.outgoing = 20000; // 클라이언트가 20초마다 heartbeat를 보냄
+                chatStompClient.heartbeat.incoming = 20000; // 서버가 20초마다 heartbeat를 받음
+
+                chatStompClient.debug = null;
+
+                chatStompClient.subscribe('/topic/chat', function (chat) {
+                    const chatData = JSON.parse(chat.body);
+                    if (chatData.chatAuthorId !== memberId) {
+                        addMessage(chatData.content, 'other', chatData.chatAuthorNickname, chatData.teamLogo); // 상대방 메시지 추가
+                    }
+                });
+            }
+            // , function (error) {
+            //     console.error('Connection error: ', error);
+            //     isConnected = false; // 연결 상태 업데이트
+            //     setTimeout(connect, reconnectInterval); // 재연결 시도
+            // }
+            );
+        }
+
+        // 처음 연결 시도
+        connect();
     });
 
-    // 메시지를 추가하는 함수
-    function addMessage(content, sender, senderNickname) {
+    function addMessage(content, sender, senderNickname, logoUrl) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'message-container ' + (sender === 'my' ? 'user' : 'bot');
+
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message ' + (sender === 'my' ? 'user' : 'bot');
 
         if (sender !== 'my') {
+            // 로고 이미지를 포함하는 요소 추가
+            const imageElement = document.createElement('img');
+            imageElement.src = logoUrl; // 기본 이미지
+            imageElement.className = 'profile-image';
+            messageContainer.appendChild(imageElement); // 프로필 이미지 추가
+
             // 작성자의 이름을 포함하는 요소 추가
             const nameDiv = document.createElement('div');
             nameDiv.className = 'sender-name';
             nameDiv.textContent = senderNickname;
-
             messageDiv.appendChild(nameDiv); // 이름 요소 추가
         }
-
 
         const contentDiv = document.createElement('div');
         contentDiv.textContent = content;
 
         messageDiv.appendChild(contentDiv); // 내용 요소 추가
+        messageContainer.appendChild(messageDiv); // 메시지 박스 추가
 
-        messagesContainer.appendChild(messageDiv);
+        const messagesContainer = document.querySelector('.messages');
+        messagesContainer.appendChild(messageContainer);
         messagesContainer.scrollTop = messagesContainer.scrollHeight; // 스크롤을 맨 아래로
     }
 

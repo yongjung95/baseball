@@ -156,6 +156,7 @@ public class MemberService {
     private MemberDto.ResponseMemberDto convertToDto(Member findMember) {
         MemberDto.ResponseMemberDto result = modelMapper.map(findMember, MemberDto.ResponseMemberDto.class);
         result.setTeamName(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getTeamName());
+        result.setTeamLogo(findMember.getFollowedTeam() == null ? null : findMember.getFollowedTeam().getLogo());
         result.setCreatedDate(findMember.getCreatedDate() == null ? null : findMember.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         result.setLastLoginDate(findMember.getCreatedDate() == null ? null : findMember.getLastLoginDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         return result;
