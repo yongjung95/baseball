@@ -5,7 +5,7 @@ values ('', '/logos/kbo/kt-wiz-logo.svg', 'Kt wiz', 'b0ca7252-70a2-4767-9bb9-0ce
 insert into team (description, logo, team_name, team_id, symbol)
 values ('', '/logos/kbo/ssg-landers-logo.svg', 'SSG 랜더스', '189381b6-33a4-49e2-9d33-0aa553298e85', 'SSG');
 insert into team (description, logo, team_name, team_id, symbol)
-values ('', '/logos/kbo/nc-dinos-ogo.svg', 'NC 다이노스', 'fd9a1bef-6e63-40b3-a1e3-b17826efe370', 'NC');
+values ('', '/logos/kbo/nc-dinos-logo.svg', 'NC 다이노스', 'fd9a1bef-6e63-40b3-a1e3-b17826efe370', 'NC');
 insert into team (description, logo, team_name, team_id, symbol)
 values ('', '/logos/kbo/doosan-bears-logo.svg', '두산 베어스', 'dc0c1501-1ae5-4e15-8558-2d86b13e6bf2', 'DOOSAN');
 insert into team (description, logo, team_name, team_id, symbol)
