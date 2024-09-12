@@ -3,9 +3,11 @@ package com.example.baseball.repository.impl;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.QComment;
 import com.example.baseball.domain.QPostLike;
+import com.example.baseball.dto.PostDto;
 import com.example.baseball.repository.PostDetailRepository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -31,12 +33,20 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
     }
 
     @Override
-    public Page<Post> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
-        List<Post> results = queryFactory.select(post)
+    public Page<PostDto.ResponsePostDto> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
+        List<PostDto.ResponsePostDto> results = queryFactory.select(
+                Projections.fields(PostDto.ResponsePostDto.class,
+                        post.postId.as("postId"),
+                        post.title.as("title"),
+                        post.createdDate.as("createTime"),
+                        post.author.nickname.as("authorNickname"),
+                        post.comments.size().as("commentCnt"),
+                        post.postLikes.size().as("likeCnt")
+                ))
                 .from(post)
-                .join(post.author, member).fetchJoin()
-                .join(post.followedTeam, team).fetchJoin()
-                .leftJoin(post.postLikes, postLike).fetchJoin()
+                .join(post.author, member)
+                .join(post.followedTeam, team)
+                .leftJoin(post.postLikes, postLike)
                 .where(post.followedTeam.teamId.eq(teamId)
                         .and(post.isUse.isTrue())
                         .and(post.title.contains(searchText)))

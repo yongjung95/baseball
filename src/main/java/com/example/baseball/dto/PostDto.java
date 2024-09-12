@@ -1,7 +1,9 @@
 package com.example.baseball.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +30,7 @@ public class PostDto {
 
     @Data
     public static class ResponsePostDto {
-        private String postId;
+        private Long postId;
         private String title;
         private String content;
         private String authorId;
@@ -36,6 +38,7 @@ public class PostDto {
         private String teamName;
         private String symbol;
         private String createDate;
+        private LocalDateTime createTime;
         private Integer likeCnt;
         private Integer viewCnt;
         private Integer commentCnt;

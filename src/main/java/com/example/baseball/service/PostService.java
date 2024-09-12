@@ -105,11 +105,12 @@ public class PostService {
     }
 
     public Page<PostDto.ResponsePostDto> selectPostList(String searchText, String teamId, Pageable pageable) {
-        Page<Post> postList = postRepository.selectPostListByTeam(searchText, teamId, pageable);
+        Page<PostDto.ResponsePostDto> result = postRepository.selectPostListByTeam(searchText, teamId, pageable);
 
-        List<PostDto.ResponsePostDto> result = postList.stream().map(this::convertToDtoList)
-                .toList();
-        return new PageImpl<>(result, pageable, postList.getTotalElements());
+        List<PostDto.ResponsePostDto> content = result.getContent();
+        content.forEach(responsePostDto -> responsePostDto.setCreateDate(formatTimeAgo(responsePostDto.getCreateTime())));
+
+        return result;
     }
 
     public PostDto.ResponsePostDto selectPost(Long postId) {
@@ -174,7 +175,7 @@ public class PostService {
         List<CommentDto.ResponseCommentDto> commentDtoList = new ArrayList<>();
         Map<Long, CommentDto.ResponseCommentDto> map = new HashMap<>(); //상위 부모를 한번에 알기 위해서 임시로 사용하는 변수
 
-        for(Comment comment : comments) {
+        for (Comment comment : comments) {
             CommentDto.ResponseCommentDto commentDto = modelMapper.map(comment, CommentDto.ResponseCommentDto.class);
             commentDto.setAuthorNickname(comment.getAuthor().getNickname());
             commentDto.setCreateDate(formatTimeAgo(comment.getCreatedDate()));
@@ -182,28 +183,15 @@ public class PostService {
             commentDto.setAuthorTeamName(comment.getAuthor().getFollowedTeam() == null ?
                     "미정" : comment.getAuthor().getFollowedTeam().getTeamName());
             map.put(commentDto.getCommentId(), commentDto);
-            if(comment.getParent() != null) {
+            if (comment.getParent() != null) {
                 map.get(comment.getParent().getCommentId()).getChildren().add(commentDto);
-            }else{
+            } else {
                 commentDtoList.add(commentDto);
             }
         }
 
         responsePostDto.setCommentCnt(comments.size());
         responsePostDto.setComments(commentDtoList);
-
-        return responsePostDto;
-    }
-
-    private PostDto.ResponsePostDto convertToDtoList(Post post) {
-        PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
-        responsePostDto.setAuthorNickname(post.getAuthor().getNickname());
-        responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
-        responsePostDto.setSymbol(post.getFollowedTeam().getSymbol());
-        responsePostDto.setAuthorId(post.getAuthor().getMemberId());
-        responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
-        responsePostDto.setLikeCnt(post.getPostLikes().size());
-        responsePostDto.setCommentCnt(post.getComments().size());
 
         return responsePostDto;
     }
