@@ -29,8 +29,8 @@ public class ChatController {
         receiveChatDto.setChatAuthorId(dto.getChatAuthorId());
         receiveChatDto.setChatAuthorNickname(responseMemberDto.getNickname());
         receiveChatDto.setContent(dto.getContent());
-        receiveChatDto.setTeamName(responseMemberDto.getTeamName());
-        receiveChatDto.setTeamLogo(responseMemberDto.getTeamLogo());
+        receiveChatDto.setTeamName(StringUtils.hasText(responseMemberDto.getTeamName()) ? responseMemberDto.getTeamName() : "미정");
+        receiveChatDto.setTeamLogo(StringUtils.hasText(responseMemberDto.getTeamName()) ? responseMemberDto.getTeamLogo() : "/logos/kbo/baseball.svg");
         messagingTemplate.convertAndSend("/topic/chat", receiveChatDto);
     }
 }

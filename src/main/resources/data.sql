@@ -26,5 +26,5 @@ insert into member (id, email, team_id, nickname, password, member_id, created_d
 values ('123','yongjung95@naver.com', 'dc0c1501-1ae5-4e15-8558-2d86b13e6bf2', '정이2', '$2a$10$7qeSaspIB2ekr7kvhwXR3Oq5PijjmE3F71Q9UlmdcFa.rM3pDewhq',
         '3b619aa2-d4ee-412c-86be-e4face9e3492', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE);
 insert into member (id, email, team_id, nickname, password, member_id, created_date, last_login_date, is_use)
-values ('1234','yongjung95@daum.net', '189381b6-33a4-49e2-9d33-0aa553298e85', '정이3', '$2a$10$7qeSaspIB2ekr7kvhwXR3Oq5PijjmE3F71Q9UlmdcFa.rM3pDewhq',
+values ('1234','yongjung95@daum.net', NULL, '정이3', '$2a$10$7qeSaspIB2ekr7kvhwXR3Oq5PijjmE3F71Q9UlmdcFa.rM3pDewhq',
         '3b619aa2-d4ee-412c-86be-e4face9e3493', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE);
