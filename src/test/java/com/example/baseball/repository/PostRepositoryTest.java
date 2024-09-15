@@ -3,6 +3,7 @@ package com.example.baseball.repository;
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.Team;
+import com.example.baseball.dto.PostDto;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
@@ -60,9 +61,9 @@ class PostRepositoryTest {
         //when
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC, "createdDate"));
 
-        Page<Post> result = postRepository.selectPostListByTeam("작성글", teamId, pageRequest);
+        Page<PostDto.ResponsePostDto> responsePostDtos = postRepository.selectPostListByTeam("작성글", teamId, pageRequest);
 
         //then
-        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(responsePostDtos.getTotalElements()).isEqualTo(1);
     }
 }

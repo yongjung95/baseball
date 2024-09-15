@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     public static final String[] AUTH_WHITELIST = {
             "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "check-id", "/check-email", "/check-nickname",
-            "/board/**", "/h2-console/**", "/favicon.ico", "/error/**", "/ws/**", "/logos/**"
+            "/board/**", "/h2-console/**", "/favicon.ico", "/error/**", "/ws/**", "/logos/**", "/news-list"
     };
 
     @Bean

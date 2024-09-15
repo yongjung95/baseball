@@ -21,4 +21,5 @@ public class Team extends BaseTimeEntity {
     private String logo;
     private String description;
     private String symbol;
+    private String shortName;
 }
