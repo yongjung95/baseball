@@ -127,18 +127,14 @@
 </style>
 <body>
 <main class="container">
-    <section>
-        <h2>Top 10 Posts</h2>
-        <div class="post">Post 1: This is a great post!</div>
-        <div class="post">Post 2: Another amazing post!</div>
-        <div class="post">Post 3: You should check this out!</div>
-        <div class="post">Post 4: A fantastic read!</div>
-        <div class="post">Post 5: Highly recommended!</div>
-        <div class="post">Post 6: Don't miss this one!</div>
-        <div class="post">Post 7: Very insightful!</div>
-        <div class="post">Post 8: Worth your time!</div>
-        <div class="post">Post 9: A must-read!</div>
-        <div class="post">Post 10: An interesting perspective!</div>
+    <section id="newsSection">
+        <h2 id="newsTitle">뉴스 리스트</h2>
+        <label for="teamId"></label>
+        <select id="teamId" name="teamId">
+            <option th:each="team : ${teamList}" th:value="${team.getTeamId()}"
+                    th:text="${team.getTeamName()}"></option> <!-- 팀 목록을 동적으로 생성 -->
+        </select>
+        <div id="newsContainer"></div>
     </section>
     <section>
 
@@ -201,7 +197,65 @@
 
         // 처음 연결 시도
         connect();
+        getNewsList('');
     });
+
+    function getNewsList(teamId) {
+        // AJAX 요청
+        $.ajax({
+            type: 'GET',
+            url: '/news-list?teamId=' + teamId, // 게시물 작성 처리 경로
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                updateNewsList(response.data);
+            }
+        });
+    }
+
+    document.getElementById('teamId').addEventListener('change', function() {
+        const selectedValue = this.value;  // 선택된 값
+        getNewsList(selectedValue);
+    });
+
+    // 뉴스 리스트를 HTML에 동적으로 추가하는 함수
+    function updateNewsList(newsList) {
+        const newsTitle = document.getElementById('newsTitle');
+        const newsContainer = document.getElementById('newsContainer');
+
+        // 팀 이름으로 제목 업데이트
+        if (newsList.length > 0) {
+            newsTitle.textContent = newsList[0].teamName + ' 뉴스';
+            document.getElementById('teamId').value = newsList[0].teamId;
+        }
+
+        // 뉴스 리스트 초기화
+        newsContainer.innerHTML = '';
+
+        // 뉴스 리스트를 동적으로 생성
+        newsList.forEach(news => {
+            // <a> 요소 생성
+            const newsLink = document.createElement('a');
+            newsLink.href = news.link;
+            newsLink.textContent = news.title;
+            newsLink.target = "_blank"; // 새 탭에서 열리도록 설정
+
+            // <span> 요소 생성
+            const pubDate = document.createElement('span');
+            pubDate.textContent = `[${news.pubDate}]`;
+            pubDate.style.marginLeft = '7px';
+            pubDate.style.fontSize = 'small';
+            pubDate.style.color = 'gray';
+
+            // <div> 요소에 추가
+            const newsDiv = document.createElement('div');
+            newsDiv.appendChild(newsLink);
+            newsDiv.appendChild(pubDate);
+
+            // newsContainer에 추가
+            newsContainer.appendChild(newsDiv);
+        });
+    }
 
     function addMessage(content, sender, senderNickname, logoUrl) {
         const messageContainer = document.createElement('div');

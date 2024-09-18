@@ -28,7 +28,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     public static final String[] AUTH_WHITELIST = {
-            "/css/styles.css", "/css", "/img", "/favicon.ico", "/error", "/ws", "/logos"
+            "/css/styles.css", "/css", "/img", "/favicon.ico", "/error", "/ws", "/logos", "/news-list"
     };
 
     @Override

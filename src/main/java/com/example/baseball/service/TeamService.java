@@ -32,4 +32,8 @@ public class TeamService {
     public TeamDto.SelectTeamDto selectTeamBySymbol(String symbol) {
         return modelMapper.map(teamRepository.findBySymbol(symbol), TeamDto.SelectTeamDto.class);
     }
+
+    public TeamDto.SelectTeamDto selectTeamByTeamName(String teamName) {
+        return modelMapper.map(teamRepository.findByTeamName(teamName), TeamDto.SelectTeamDto.class);
+    }
 }
