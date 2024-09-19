@@ -53,3 +53,5 @@ logging:
 jwt:
   expiration_time: 3600000
   secret: BaseballSecretKeyBaseballSecretKey
+file:
+  upload-dir: /Users/junge/IdeaProjects/uploads
