@@ -7,6 +7,7 @@ import com.example.baseball.dto.AttachmentFileDto;
 import com.example.baseball.repository.AttachmentFileRepository;
 import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.exception.ApiException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ public class AttachmentFileService {
     private final AttachmentFileRepository attachmentFileRepository;
     private final ModelMapper modelMapper;
 
+    @Getter
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -46,7 +49,7 @@ public class AttachmentFileService {
                 throw new ApiException(ErrorCode.ATTACHMENT_FILE_IS_ONLY_IMAGE);
             }
 
-            String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+            String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1);
 
             String fileName = UUID.randomUUID() + "." + extension;
             // 파일 저장 경로 설정

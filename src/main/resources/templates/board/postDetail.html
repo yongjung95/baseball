@@ -11,6 +11,9 @@
         <input id="symbol" type="hidden" th:value="${post.symbol}">
         <p><span th:text="${post.authorNickname}">작성자</span> <span th:text="${post.createDate}">작성일</span></p>
         <hr>
+        <div th:each="file : ${post.files}">
+            <img th:src="${'/post/files/' + file.fileName}" th:alt="${file.fileOriginalName}" style="max-width: 900px; height: auto;" />
+        </div>
         <div th:text="${post.content}">게시글 내용</div>
         <hr>
         <div class="text-center mt-4">

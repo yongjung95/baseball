@@ -4,23 +4,24 @@ import com.example.baseball.domain.Comment;
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.PostLike;
+import com.example.baseball.dto.AttachmentFileDto;
 import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
 import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.PostLikeRepository;
 import com.example.baseball.repository.PostRepository;
-import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.response.error.ErrorCode;
+import com.example.baseball.response.exception.ApiException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,8 +39,9 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
+    private final AttachmentFileService attachmentFileService;
 
-    public PostDto.ResponsePostDto savePost(PostDto.SavePostRequestDto dto) {
+    public PostDto.ResponsePostDto savePost(PostDto.SavePostRequestDto dto) throws IOException {
         Member member = memberRepository.findByMemberId(dto.getAuthorId());
         if (member == null) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
@@ -59,6 +61,11 @@ public class PostService {
         PostDto.ResponsePostDto result = modelMapper.map(post, PostDto.ResponsePostDto.class);
         result.setTeamName(member.getFollowedTeam().getTeamName());
         result.setAuthorNickname(member.getNickname());
+
+        if (!dto.getFiles().isEmpty()) {
+            List<AttachmentFileDto.SelectAttachmentFileDto> files = attachmentFileService.saveAttachmentFile(dto.getFiles(), member, post);
+            result.setFiles(files);
+        }
 
         return result;
     }
@@ -161,6 +168,8 @@ public class PostService {
             @Override
             protected void configure() {
                 skip(destination.getComments());
+                skip(destination.getFiles());
+                map().setTeamName(source.getFollowedTeam().getTeamName());
             }
         });
         PostDto.ResponsePostDto responsePostDto = modelMapper.map(post, PostDto.ResponsePostDto.class);
@@ -170,6 +179,8 @@ public class PostService {
         responsePostDto.setAuthorId(post.getAuthor().getMemberId());
         responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
         responsePostDto.setLikeCnt(post.getPostLikes().size());
+
+        // 댓글
         List<Comment> comments = commentRepository.findCommentsByPostId(post.getPostId());
 
         List<CommentDto.ResponseCommentDto> commentDtoList = new ArrayList<>();
@@ -192,6 +203,10 @@ public class PostService {
 
         responsePostDto.setCommentCnt(comments.size());
         responsePostDto.setComments(commentDtoList);
+        // 댓글
+
+        List<AttachmentFileDto.SelectAttachmentFileDto> files = attachmentFileService.selectAttachmentFileByPostId(post.getPostId());
+        responsePostDto.setFiles(files);
 
         return responsePostDto;
     }

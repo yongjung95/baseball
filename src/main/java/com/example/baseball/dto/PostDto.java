@@ -1,11 +1,11 @@
 package com.example.baseball.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
@@ -17,6 +17,7 @@ public class PostDto {
         @NotBlank(message = "내용을 입력해주세요.")
         private String content;
         private String authorId;
+        private List<MultipartFile> files = new ArrayList<>();
     }
 
     @Data
@@ -43,6 +44,7 @@ public class PostDto {
         private Integer viewCnt;
         private Integer commentCnt;
         private List<CommentDto.ResponseCommentDto> comments;
+        private List<AttachmentFileDto.SelectAttachmentFileDto> files;
     }
 
     @Data

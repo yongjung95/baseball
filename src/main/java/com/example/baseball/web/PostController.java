@@ -8,10 +8,11 @@ import com.example.baseball.service.PostService;
 import com.example.baseball.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class PostController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/post")
-    public SingleResult<?> post(@CookieValue(value = "token") String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
+    public SingleResult<?> post(@CookieValue(value = "token") String token, @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) throws IOException {
         if (bindResult.hasErrors()) {
             for (ObjectError allError : bindResult.getAllErrors()) {
                 return responseService.getFailParameter(allError.getDefaultMessage());

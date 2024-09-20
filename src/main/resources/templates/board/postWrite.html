@@ -27,7 +27,7 @@
 <main class="container mt-5">
     <section class="form-section">
         <h2>새 게시물 작성</h2>
-        <form id="postForm">
+        <form id="postForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">제목</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하세요" required>
@@ -35,6 +35,18 @@
             <div class="form-group">
                 <label for="content">내용</label>
                 <textarea class="form-control" id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="content">첨부파일</label>
+                <button type="button" onclick="addFile();" class="btns fn_add_btn"><span>파일 추가</span></button>
+                <div class="file_list">
+                    <div>
+                        <div class="file_input">
+                            <input type="file" id="fileInput" accept="image/*"/>
+                            <button type="button" onclick="removeFile(this);" class="btns del_btn"><span>삭제</span></button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="d-flex justify-content-between align-items-center">
                 <button type="submit" class="btn btn-primary">작성하기</button>
@@ -48,18 +60,23 @@
         event.preventDefault(); // 폼 제출 기본 동작 방지
 
         if (confirm('저장하시겠습니까?')) {
-            // 폼 데이터 수집
-            var formData = {
-                title: $('#title').val(),
-                content: $('#content').val()
-            };
+            var form = document.getElementById('postForm');
+            var formData = new FormData(form);
+
+            var files = document.getElementById('fileInput').files;
+
+            // 선택된 파일들을 FormData에 추가
+            for (var i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
 
             // AJAX 요청
             $.ajax({
                 type: 'POST',
                 url: '/post', // 게시물 작성 처리 경로
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
+                data: formData,
+                processData: false, // 파일과 같은 데이터를 전송할 때는 false
+                contentType: false, // FormData는 Content-Type을 자동으로 설정하므로 false
                 dataType: 'json',
                 success: function (response) {
                     // 성공 메시지 출력
@@ -80,6 +97,25 @@
     $('#cancelButton').on('click', function () {
         window.history.back(); // 이전 페이지로 이동
     });
+
+    // 파일 추가
+    function addFile() {
+        const fileDiv = document.createElement('div');
+        fileDiv.innerHTML =`
+            <div class="file_input">
+                <input type="file" name="files" accept="image/*"/>
+                <button type="button" onclick="removeFile(this);" class="btns del_btn"><span>삭제</span></button>
+            </div>
+        `;
+        document.querySelector('.file_list').appendChild(fileDiv);
+    }
+
+    // 파일 삭제
+    function removeFile(button) {
+        // 클릭된 버튼의 부모 요소인 .file_input을 찾아서 제거
+        var fileInputDiv = button.parentElement; // button의 부모 div인 .file_input
+        fileInputDiv.remove(); // .file_input 요소를 제거
+    }
 </script>
 </body>
 </html>

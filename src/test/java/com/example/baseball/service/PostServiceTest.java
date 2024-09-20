@@ -18,6 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -47,6 +50,7 @@ class PostServiceTest {
 
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
                 .password("123456")
@@ -59,11 +63,21 @@ class PostServiceTest {
         dto.setContent("게시글 테스트");
         dto.setAuthorId(member.getMemberId());
 
+        MultipartFile mockFile = new MockMultipartFile(
+                "image",
+                "test-file.img",
+                MediaType.IMAGE_JPEG_VALUE,
+                "This is a plain text file".getBytes()
+        );
+
+        dto.getFiles().add(mockFile);
+
         //when
         PostDto.ResponsePostDto responsePostDto = postService.savePost(dto);
 
         //then
         assertThat(responsePostDto.getTitle()).isEqualTo(dto.getTitle());
+        assertThat(responsePostDto.getFiles().size()).isEqualTo(1);
     }
 
     @Test
