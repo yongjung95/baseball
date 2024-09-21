@@ -42,7 +42,7 @@
                 <div class="file_list">
                     <div>
                         <div class="file_input">
-                            <input type="file" id="fileInput" accept="image/*"/>
+                            <input type="file" id="fileInput" accept="image/*" onchange="selectFile(this)"/>
                             <button type="button" onclick="removeFile(this);" class="btns del_btn"><span>삭제</span></button>
                         </div>
                     </div>
@@ -56,14 +56,14 @@
     </section>
 </main>
 <script>
+
+    var files = [];
     $('#postForm').on('submit', function (event) {
         event.preventDefault(); // 폼 제출 기본 동작 방지
 
         if (confirm('저장하시겠습니까?')) {
             var form = document.getElementById('postForm');
             var formData = new FormData(form);
-
-            var files = document.getElementById('fileInput').files;
 
             // 선택된 파일들을 FormData에 추가
             for (var i = 0; i < files.length; i++) {
@@ -103,7 +103,7 @@
         const fileDiv = document.createElement('div');
         fileDiv.innerHTML =`
             <div class="file_input">
-                <input type="file" name="files" accept="image/*"/>
+                <input type="file" accept="image/*" onchange="selectFile(this)"/>
                 <button type="button" onclick="removeFile(this);" class="btns del_btn"><span>삭제</span></button>
             </div>
         `;
@@ -113,8 +113,26 @@
     // 파일 삭제
     function removeFile(button) {
         // 클릭된 버튼의 부모 요소인 .file_input을 찾아서 제거
-        var fileInputDiv = button.parentElement; // button의 부모 div인 .file_input
+        var parentDiv = button.parentElement;
+        var fileInputDiv = button.parentElement;
+        var input = parentDiv.querySelector('input[type="file"]');
+        var file = input.files[0]; // 삭제하려는 파일
+
+        if (file) {
+            // 선택된 파일이 배열에서 몇 번째인지 찾음
+            var fileIndex = files.findIndex(f => f.name === file.name);
+
+            if (fileIndex !== -1) {
+                files.splice(fileIndex, 1); // 배열에서 해당 파일 삭제
+            }
+        }
+
         fileInputDiv.remove(); // .file_input 요소를 제거
+    }
+
+    function selectFile(input) {
+        // 선택된 파일 처리 로직을 여기에 작성
+        files.push(input.files[0]);
     }
 </script>
 </body>
