@@ -27,6 +27,8 @@ public class PostDto {
         private String content;
         private String authorId;
         private Boolean isUse = true;
+        private List<Long> deleteFileIds = new ArrayList<>();
+        private List<MultipartFile> files = new ArrayList<>();
     }
 
     @Data

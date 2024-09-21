@@ -38,7 +38,7 @@ public class PostController {
 
     @PostMapping("/post/{postId}")
     public SingleResult<?> post(@CookieValue(value = "token") String token,
-                                @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
+                                @PathVariable("postId") Long postId, PostDto.UpdatePostRequestDto dto) throws IOException {
         if (postId == null || postId <= 0) {
             return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
         }
@@ -52,6 +52,23 @@ public class PostController {
         }
 
         return responseService.getSingleResult(postService.updatePost(dto));
+    }
+
+    @DeleteMapping("/post/{postId}")
+    public SingleResult<?> deletePost(@CookieValue(value = "token") String token,
+                                      @PathVariable("postId") Long postId) {
+        if (postId == null || postId <= 0) {
+            return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
+        }
+        String memberId = jwtUtil.getMemberId(token);
+
+        PostDto.UpdatePostRequestDto dto = new PostDto.UpdatePostRequestDto();
+        dto.setAuthorId(memberId);
+        dto.setPostId(postId);
+        dto.setIsUse(false);
+
+        postService.deletePost(dto);
+        return responseService.getSuccessResult();
     }
 
     @PostMapping("/post/{postId}/like")

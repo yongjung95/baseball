@@ -12,7 +12,7 @@
         <p><span th:text="${post.authorNickname}">작성자</span> <span th:text="${post.createDate}">작성일</span></p>
         <hr>
         <div th:each="file : ${post.files}">
-            <img th:src="${'/post/files/' + file.fileName}" th:alt="${file.fileOriginalName}" style="max-width: 900px; height: auto;" />
+            <img th:src="${'/files/' + file.fileName}" th:alt="${file.fileOriginalName}" style="max-width: 900px; height: auto;" />
         </div>
         <div th:text="${post.content}">게시글 내용</div>
         <hr>
@@ -131,9 +131,8 @@
 
                 $.ajax({
                     url: '/post/' + postId, // 여기에 게시글 ID 추가
-                    type: 'POST',
+                    type: 'DELETE',
                     contentType: 'application/json',
-                    data: JSON.stringify({isUse: false}),
                     success: function (response) {
                         if (response.code === "200") {
                             alert('삭제 되었습니다.');

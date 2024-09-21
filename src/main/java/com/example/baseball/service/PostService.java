@@ -20,6 +20,7 @@ import org.modelmapper.PropertyMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -85,10 +86,16 @@ public class PostService {
             throw new ApiException(ErrorCode.AUTHOR_IS_NOT_MATCHED);
         }
 
+        List<AttachmentFileDto.SelectAttachmentFileDto> attachmentFileList = attachmentFileService.selectAttachmentFileByPostId(post.getPostId());
+
+        for (AttachmentFileDto.SelectAttachmentFileDto selectAttachmentFileDto : attachmentFileList) {
+            attachmentFileService.deleteAttachmentFile(selectAttachmentFileDto.getId(), dto.getAuthorId());
+        }
+
         post.changeIsUse();
     }
 
-    public PostDto.ResponsePostDto updatePost(PostDto.UpdatePostRequestDto dto) {
+    public PostDto.ResponsePostDto updatePost(PostDto.UpdatePostRequestDto dto) throws IOException {
         Member member = memberRepository.findByMemberId(dto.getAuthorId());
         if (member == null) {
             throw new ApiException(ErrorCode.MEMBER_IS_NOT_FOUND);
@@ -103,10 +110,25 @@ public class PostService {
             throw new ApiException(ErrorCode.AUTHOR_IS_NOT_MATCHED);
         }
 
+        List<Long> deleteFileIds = dto.getDeleteFileIds();
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
+            for (Long deleteFileId : deleteFileIds) {
+                attachmentFileService.deleteAttachmentFile(deleteFileId, dto.getAuthorId());
+
+            }
+        }
+
         post.updatePost(dto.getTitle(), dto.getContent());
-        PostDto.ResponsePostDto result = modelMapper.map(post, PostDto.ResponsePostDto.class);
+
+        PostDto.ResponsePostDto result = convertToDto(post);
         result.setAuthorNickname(post.getAuthor().getNickname());
         result.setTeamName(post.getFollowedTeam().getTeamName());
+
+        List<MultipartFile> files = dto.getFiles();
+        if (!files.isEmpty()) {
+            List<AttachmentFileDto.SelectAttachmentFileDto> resultFiles = attachmentFileService.saveAttachmentFile(dto.getFiles(), member, post);
+            result.setFiles(resultFiles);
+        }
 
         return result;
     }

@@ -111,7 +111,12 @@ public class AttachmentFileService {
             throw new ApiException(ErrorCode.ATTACHMENT_FILE_IS_NOT_FOUND);
         }
 
-        attachmentFile.deleteFile();
+        try {
+            Path filePath = Paths.get(attachmentFile.getFilePath());
+            Files.delete(filePath);
+            attachmentFile.deleteFile();
+        } catch (Exception e) {
+            throw new ApiException(ErrorCode.ATTACHMENT_FILE_IS_NOT_FOUND);
+        }
     }
-
 }
