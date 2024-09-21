@@ -1,9 +1,7 @@
 package com.example.baseball.security;
 
-import com.example.baseball.response.service.ResponseService;
 import com.example.baseball.service.CustomUserDetailsService;
 import com.example.baseball.util.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,7 +17,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -28,7 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     public static final String[] AUTH_WHITELIST = {
-            "/css/styles.css", "/css", "/img", "/favicon.ico", "/error", "/ws", "/logos", "/news-list"
+            "/css/styles.css", "/css", "/img", "/favicon.ico", "/error", "/ws", "/logos", "/news-list", "/files"
     };
 
     @Override

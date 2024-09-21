@@ -1,9 +1,6 @@
 package com.example.baseball.service;
 
-import com.example.baseball.domain.Comment;
-import com.example.baseball.domain.Member;
-import com.example.baseball.domain.Post;
-import com.example.baseball.domain.Team;
+import com.example.baseball.domain.*;
 import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
 import com.example.baseball.repository.CommentRepository;
@@ -18,7 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +48,7 @@ class PostServiceTest {
 
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
                 .password("123456")
@@ -59,11 +61,21 @@ class PostServiceTest {
         dto.setContent("게시글 테스트");
         dto.setAuthorId(member.getMemberId());
 
+        MultipartFile mockFile = new MockMultipartFile(
+                "image",
+                "test-file.img",
+                MediaType.IMAGE_JPEG_VALUE,
+                "This is a plain text file".getBytes()
+        );
+
+        dto.getFiles().add(mockFile);
+
         //when
         PostDto.ResponsePostDto responsePostDto = postService.savePost(dto);
 
         //then
         assertThat(responsePostDto.getTitle()).isEqualTo(dto.getTitle());
+        assertThat(responsePostDto.getFiles().size()).isEqualTo(1);
     }
 
     @Test
@@ -158,6 +170,7 @@ class PostServiceTest {
 
         Member member = Member.builder()
                 .memberId(UUID.randomUUID().toString())
+                .id("yongjung95")
                 .email("yongjung95@gmail.com")
                 .nickname("정이")
                 .password("123456")
@@ -171,8 +184,35 @@ class PostServiceTest {
                 .author(member)
                 .followedTeam(team)
                 .build();
-
         entityManager.persist(post);
+
+        MultipartFile mockFile = new MockMultipartFile(
+                "image",
+                "test-file.img",
+                MediaType.IMAGE_JPEG_VALUE,
+                "This is a plain text file".getBytes()
+        );
+
+        AttachmentFile attachmentFile = AttachmentFile.builder()
+                .fileName(mockFile.getName())
+                .fileOriginalName(mockFile.getOriginalFilename())
+                .fileSize(mockFile.getSize())
+                .fileContentType(mockFile.getContentType())
+                .post(post)
+                .regMember(member)
+                .build();
+        AttachmentFile attachmentFile2 = AttachmentFile.builder()
+                .fileName(mockFile.getName())
+                .fileOriginalName(mockFile.getOriginalFilename())
+                .fileSize(mockFile.getSize())
+                .fileContentType(mockFile.getContentType())
+                .post(post)
+                .regMember(member)
+                .build();
+
+        entityManager.persist(attachmentFile);
+        entityManager.persist(attachmentFile2);
+
         entityManager.flush();
         entityManager.clear();
 
@@ -181,11 +221,13 @@ class PostServiceTest {
         dto.setTitle("게시글 변경테스트");
         dto.setPostId(post.getPostId());
         dto.setAuthorId(member.getMemberId());
+        dto.setDeleteFileIds(Collections.singletonList(attachmentFile.getId()));
 
         //then
         PostDto.ResponsePostDto result = postService.updatePost(dto);
 
         assertThat(result.getTitle()).isEqualTo(dto.getTitle());
+        assertThat(result.getFiles().size()).isEqualTo(1);
     }
 
     @Test

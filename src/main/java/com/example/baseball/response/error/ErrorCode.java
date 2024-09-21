@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public enum ErrorCode {
 
     PARAMETER_IS_EMPTY(400,"C000","파라미터가 올바르지 않습니다."),
+    ATTACHMENT_FILE_IS_EMPTY(400, "C001", "파일이 업로드되지 않았습니다."),
+    ATTACHMENT_FILE_IS_ONLY_IMAGE(400, "C002", "이미지 파일만 업로드 가능합니다."),
+    ATTACHMENT_FILE_IS_NOT_FOUND(400, "C003", "파일이 존재하지 않습니다."),
+
+
 
     // 회원 관련
     MEMBER_IS_NOT_FOUND(403, "M001", "회원 정보가 없습니다."),

@@ -8,7 +8,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,7 @@ public class TeamService {
         return teamRepository.findAll().stream().map(team -> modelMapper.map(team, TeamDto.SelectTeamDto.class)).collect(Collectors.toList());
     }
 
+    @Cacheable("team")
     public TeamDto.SelectTeamDto selectTeamBySymbol(String symbol) {
         return modelMapper.map(teamRepository.findBySymbol(symbol), TeamDto.SelectTeamDto.class);
     }

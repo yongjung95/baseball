@@ -1,9 +1,7 @@
 package com.example.baseball.security;
 
-import com.example.baseball.response.service.ResponseService;
 import com.example.baseball.service.CustomUserDetailsService;
 import com.example.baseball.util.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +27,7 @@ public class SecurityConfig {
 
     public static final String[] AUTH_WHITELIST = {
             "/js/**", "/css/**", "/img/**", "/", "/login", "/sign-up", "/member", "check-id", "/check-email", "/check-nickname",
-            "/board/**", "/h2-console/**", "/favicon.ico", "/error/**", "/ws/**", "/logos/**", "/news-list"
+            "/board/**", "/h2-console/**", "/favicon.ico", "/error/**", "/ws/**", "/logos/**", "/news-list", "/files/**"
     };
 
     @Bean

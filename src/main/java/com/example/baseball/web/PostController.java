@@ -8,10 +8,11 @@ import com.example.baseball.service.PostService;
 import com.example.baseball.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class PostController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/post")
-    public SingleResult<?> post(@CookieValue(value = "token") String token, @RequestBody @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) {
+    public SingleResult<?> post(@CookieValue(value = "token") String token, @Valid PostDto.SavePostRequestDto dto, BindingResult bindResult) throws IOException {
         if (bindResult.hasErrors()) {
             for (ObjectError allError : bindResult.getAllErrors()) {
                 return responseService.getFailParameter(allError.getDefaultMessage());
@@ -37,7 +38,7 @@ public class PostController {
 
     @PostMapping("/post/{postId}")
     public SingleResult<?> post(@CookieValue(value = "token") String token,
-                                @PathVariable("postId") Long postId, @RequestBody PostDto.UpdatePostRequestDto dto) {
+                                @PathVariable("postId") Long postId, PostDto.UpdatePostRequestDto dto) throws IOException {
         if (postId == null || postId <= 0) {
             return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
         }
@@ -51,6 +52,23 @@ public class PostController {
         }
 
         return responseService.getSingleResult(postService.updatePost(dto));
+    }
+
+    @DeleteMapping("/post/{postId}")
+    public SingleResult<?> deletePost(@CookieValue(value = "token") String token,
+                                      @PathVariable("postId") Long postId) {
+        if (postId == null || postId <= 0) {
+            return responseService.getFailResult(ErrorCode.POST_IS_NOT_FOUND);
+        }
+        String memberId = jwtUtil.getMemberId(token);
+
+        PostDto.UpdatePostRequestDto dto = new PostDto.UpdatePostRequestDto();
+        dto.setAuthorId(memberId);
+        dto.setPostId(postId);
+        dto.setIsUse(false);
+
+        postService.deletePost(dto);
+        return responseService.getSuccessResult();
     }
 
     @PostMapping("/post/{postId}/like")
