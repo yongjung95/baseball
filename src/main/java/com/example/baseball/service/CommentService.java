@@ -8,12 +8,17 @@ import com.example.baseball.dto.CommentDto;
 import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.PostRepository;
-import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.response.error.ErrorCode;
+import com.example.baseball.response.exception.ApiException;
+import com.example.baseball.util.FormatUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +28,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final ModelMapper modelMapper;
 
     public CommentDto.SendTopicCommentDto saveComment(CommentDto.SaveCommentDto dto) {
         Post post = postRepository.findByPostId(dto.getPostId());
@@ -73,6 +77,36 @@ public class CommentService {
         }
 
         findComment.changeIsUse();
+    }
+
+    public List<CommentDto.ResponseCommentDto> selectCommentList(Long postId) {
+        List<Comment> comments = commentRepository.findCommentsByPostId(postId);
+
+        List<CommentDto.ResponseCommentDto> commentDtoList = new ArrayList<>();
+        Map<Long, CommentDto.ResponseCommentDto> map = new HashMap<>(); //상위 부모를 한번에 알기 위해서 임시로 사용하는 변수
+
+        for (Comment comment : comments) {
+            CommentDto.ResponseCommentDto commentDto = CommentDto.ResponseCommentDto.builder()
+                    .commentId(comment.getCommentId())
+                    .content(comment.getContent())
+                    .postId(comment.getPost().getPostId())
+                    .authorNickname(comment.getAuthor().getNickname())
+                    .authorTeamName(comment.getAuthor().getFollowedTeam() == null ?
+                            "미정" : comment.getAuthor().getFollowedTeam().getTeamName())
+                    .authorId(comment.getAuthor().getMemberId())
+                    .createDate(FormatUtil.formatTimeAgo(comment.getCreatedDate()))
+                    .isUse(comment.getIsUse())
+                    .build();
+
+            map.put(commentDto.getCommentId(), commentDto);
+            if (comment.getParent() != null) {
+                map.get(comment.getParent().getCommentId()).getChildren().add(commentDto);
+            } else {
+                commentDtoList.add(commentDto);
+            }
+        }
+
+        return commentDtoList;
     }
 
 }
