@@ -209,12 +209,18 @@ public class PostService {
         Map<Long, CommentDto.ResponseCommentDto> map = new HashMap<>(); //상위 부모를 한번에 알기 위해서 임시로 사용하는 변수
 
         for (Comment comment : comments) {
-            CommentDto.ResponseCommentDto commentDto = modelMapper.map(comment, CommentDto.ResponseCommentDto.class);
-            commentDto.setAuthorNickname(comment.getAuthor().getNickname());
-            commentDto.setCreateDate(formatTimeAgo(comment.getCreatedDate()));
-            commentDto.setAuthorId(comment.getAuthor().getMemberId());
-            commentDto.setAuthorTeamName(comment.getAuthor().getFollowedTeam() == null ?
-                    "미정" : comment.getAuthor().getFollowedTeam().getTeamName());
+            CommentDto.ResponseCommentDto commentDto = CommentDto.ResponseCommentDto.builder()
+                    .commentId(comment.getCommentId())
+                    .content(comment.getContent())
+                    .postId(comment.getPost().getPostId())
+                    .authorNickname(comment.getAuthor().getNickname())
+                    .authorTeamName(comment.getAuthor().getFollowedTeam() == null ?
+                            "미정" : comment.getAuthor().getFollowedTeam().getTeamName())
+                    .authorId(comment.getAuthor().getMemberId())
+                    .createDate(formatTimeAgo(comment.getCreatedDate()))
+                    .isUse(comment.getIsUse())
+                    .build();
+
             map.put(commentDto.getCommentId(), commentDto);
             if (comment.getParent() != null) {
                 map.get(comment.getParent().getCommentId()).getChildren().add(commentDto);
@@ -227,8 +233,10 @@ public class PostService {
         responsePostDto.setComments(commentDtoList);
         // 댓글
 
+        // 첨부파일
         List<AttachmentFileDto.SelectAttachmentFileDto> files = attachmentFileService.selectAttachmentFileByPostId(post.getPostId());
         responsePostDto.setFiles(files);
+        // 첨부파일
 
         return responsePostDto;
     }
