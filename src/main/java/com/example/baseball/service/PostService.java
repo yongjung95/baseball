@@ -1,18 +1,17 @@
 package com.example.baseball.service;
 
-import com.example.baseball.domain.Comment;
 import com.example.baseball.domain.Member;
 import com.example.baseball.domain.Post;
 import com.example.baseball.domain.PostLike;
 import com.example.baseball.dto.AttachmentFileDto;
 import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
-import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.PostLikeRepository;
 import com.example.baseball.repository.PostRepository;
 import com.example.baseball.response.error.ErrorCode;
 import com.example.baseball.response.exception.ApiException;
+import com.example.baseball.util.FormatUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,12 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +32,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
-    private final CommentRepository commentRepository;
     private final ModelMapper modelMapper;
     private final AttachmentFileService attachmentFileService;
+    private final CommentService commentService;
 
     public PostDto.ResponsePostDto savePost(PostDto.SavePostRequestDto dto) throws IOException {
         Member member = memberRepository.findByMemberId(dto.getAuthorId());
@@ -137,7 +131,7 @@ public class PostService {
         Page<PostDto.ResponsePostDto> result = postRepository.selectPostListByTeam(searchText, teamId, pageable);
 
         List<PostDto.ResponsePostDto> content = result.getContent();
-        content.forEach(responsePostDto -> responsePostDto.setCreateDate(formatTimeAgo(responsePostDto.getCreateTime())));
+        content.forEach(responsePostDto -> responsePostDto.setCreateDate(FormatUtil.formatTimeAgo(responsePostDto.getCreateTime())));
 
         return result;
     }
@@ -199,37 +193,12 @@ public class PostService {
         responsePostDto.setTeamName(post.getFollowedTeam().getTeamName());
         responsePostDto.setSymbol(post.getFollowedTeam().getSymbol());
         responsePostDto.setAuthorId(post.getAuthor().getMemberId());
-        responsePostDto.setCreateDate(formatTimeAgo(post.getCreatedDate()));
+        responsePostDto.setCreateDate(FormatUtil.formatTimeAgo(post.getCreatedDate()));
         responsePostDto.setLikeCnt(post.getPostLikes().size());
 
         // 댓글
-        List<Comment> comments = commentRepository.findCommentsByPostId(post.getPostId());
-
-        List<CommentDto.ResponseCommentDto> commentDtoList = new ArrayList<>();
-        Map<Long, CommentDto.ResponseCommentDto> map = new HashMap<>(); //상위 부모를 한번에 알기 위해서 임시로 사용하는 변수
-
-        for (Comment comment : comments) {
-            CommentDto.ResponseCommentDto commentDto = CommentDto.ResponseCommentDto.builder()
-                    .commentId(comment.getCommentId())
-                    .content(comment.getContent())
-                    .postId(comment.getPost().getPostId())
-                    .authorNickname(comment.getAuthor().getNickname())
-                    .authorTeamName(comment.getAuthor().getFollowedTeam() == null ?
-                            "미정" : comment.getAuthor().getFollowedTeam().getTeamName())
-                    .authorId(comment.getAuthor().getMemberId())
-                    .createDate(formatTimeAgo(comment.getCreatedDate()))
-                    .isUse(comment.getIsUse())
-                    .build();
-
-            map.put(commentDto.getCommentId(), commentDto);
-            if (comment.getParent() != null) {
-                map.get(comment.getParent().getCommentId()).getChildren().add(commentDto);
-            } else {
-                commentDtoList.add(commentDto);
-            }
-        }
-
-        responsePostDto.setCommentCnt(comments.size());
+        List<CommentDto.ResponseCommentDto> commentDtoList = commentService.selectCommentList(post.getPostId());
+        responsePostDto.setCommentCnt(commentDtoList.size());
         responsePostDto.setComments(commentDtoList);
         // 댓글
 
@@ -239,25 +208,5 @@ public class PostService {
         // 첨부파일
 
         return responsePostDto;
-    }
-
-    private String formatTimeAgo(LocalDateTime dateTime) {
-        LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(dateTime, now);
-
-        long seconds = duration.getSeconds();
-
-        if (seconds < 60) {
-            return "방금 전";
-        } else if (seconds < 3600) {
-            long minutes = seconds / 60;
-            return minutes + "분 전";
-        } else if (seconds < 86400) { // 24 * 60 * 60
-            long hours = seconds / 3600;
-            return hours + "시간 전";
-        } else {
-            long days = seconds / 86400;
-            return days + "일 전";
-        }
     }
 }
