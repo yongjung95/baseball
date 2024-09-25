@@ -41,10 +41,10 @@ public class CommentController {
     @MessageMapping("/comment")
     public void sendComment(@RequestBody @Valid CommentDto.SendTopicCommentDto dto) {
         // 클라이언트에 알림 전송
-        messagingTemplate.convertAndSend("/comment/comments/" + dto.getPostAuthorId(), dto);
+        messagingTemplate.convertAndSend("/comment/" + dto.getPostAuthorId(), dto);
     }
 
-    @PostMapping("/comment/{commentId}")
+    @DeleteMapping("/comment/{commentId}")
     public SingleResult<?> comment(@CookieValue(value = "token") String token, @PathVariable(value = "commentId") Long commentId) {
         if (commentId == null) {
             return responseService.getFailResult(ErrorCode.PARAMETER_IS_EMPTY);

@@ -104,7 +104,7 @@
                     stompClient.debug = null;
 
                     stompClient.connect({}, function (frame) {
-                        stompClient.subscribe('/comment/comments/' + memberId, function (comment) {
+                        stompClient.subscribe('/comment/' + memberId, function (comment) {
                             const commentData = JSON.parse(comment.body);
                             showNotification('새로운 댓글이 작성되었습니다.', '/board/post/' + commentData.postId);
                         });
