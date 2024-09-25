@@ -44,7 +44,7 @@ public class CommentController {
         messagingTemplate.convertAndSend("/comment/comments/" + dto.getPostAuthorId(), dto);
     }
 
-    @PostMapping("/comment/{commentId}")
+    @DeleteMapping("/comment/{commentId}")
     public SingleResult<?> comment(@CookieValue(value = "token") String token, @PathVariable(value = "commentId") Long commentId) {
         if (commentId == null) {
             return responseService.getFailResult(ErrorCode.PARAMETER_IS_EMPTY);

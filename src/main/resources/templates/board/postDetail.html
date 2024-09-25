@@ -192,17 +192,16 @@
     document.querySelectorAll('.delete-button').forEach(button => {
         button.addEventListener('click', function () {
             const commentId = this.getAttribute('data-comment-id');
-            const replyFormContainer = document.getElementById(`reply-form-${commentId}`);
 
             if (confirm('정말로 삭제하시겠습니까?')) {
                 $.ajax({
                     url: '/comment/' + commentId,
-                    type: 'POST',
+                    type: 'DELETE',
                     contentType: 'application/json',
                     success: function (response) {
                         if (response.code === "200") {
                             alert('삭제 되었습니다.');
-                            location.reload(true);
+                            location.reload();
                         } else {
                             alert(response.message);
                         }
