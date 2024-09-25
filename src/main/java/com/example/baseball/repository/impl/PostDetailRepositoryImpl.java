@@ -1,8 +1,6 @@
 package com.example.baseball.repository.impl;
 
 import com.example.baseball.domain.Post;
-import com.example.baseball.domain.QComment;
-import com.example.baseball.domain.QPostLike;
 import com.example.baseball.dto.PostDto;
 import com.example.baseball.repository.PostDetailRepository;
 import com.querydsl.core.types.Order;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
-import static com.example.baseball.domain.QComment.comment;
 import static com.example.baseball.domain.QMember.member;
 import static com.example.baseball.domain.QPost.post;
 import static com.example.baseball.domain.QPostLike.postLike;
@@ -33,9 +30,9 @@ public class PostDetailRepositoryImpl implements PostDetailRepository {
     }
 
     @Override
-    public Page<PostDto.ResponsePostDto> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
-        List<PostDto.ResponsePostDto> results = queryFactory.select(
-                Projections.fields(PostDto.ResponsePostDto.class,
+    public Page<PostDto.SelectPostListDto> selectPostListByTeam(String searchText, String teamId, Pageable pageable) {
+        List<PostDto.SelectPostListDto> results = queryFactory.select(
+                Projections.fields(PostDto.SelectPostListDto.class,
                         post.postId.as("postId"),
                         post.title.as("title"),
                         post.createdDate.as("createTime"),

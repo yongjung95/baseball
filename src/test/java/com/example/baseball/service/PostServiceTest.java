@@ -3,7 +3,6 @@ package com.example.baseball.service;
 import com.example.baseball.domain.*;
 import com.example.baseball.dto.CommentDto;
 import com.example.baseball.dto.PostDto;
-import com.example.baseball.repository.CommentRepository;
 import com.example.baseball.repository.PostRepository;
 import com.example.baseball.response.exception.ApiException;
 import jakarta.persistence.EntityManager;
@@ -34,8 +33,6 @@ class PostServiceTest {
     private EntityManager entityManager;
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private CommentRepository commentRepository;
 
     @Test
     void 게시물_생성() throws Exception {
@@ -271,9 +268,8 @@ class PostServiceTest {
         String searchText = "게시글";
 
         //then
-        Page<PostDto.ResponsePostDto> result = postService.selectPostList(searchText, team.getTeamId(), pageRequest);
+        Page<PostDto.SelectPostListDto> result = postService.selectPostList(searchText, team.getTeamId(), pageRequest);
         assertThat(result.getContent().size()).isEqualTo(2);
-        assertThat(result.getContent().get(0).getTeamName()).isEqualTo("SSG");
     }
 
     @Test

@@ -127,10 +127,10 @@ public class PostService {
         return result;
     }
 
-    public Page<PostDto.ResponsePostDto> selectPostList(String searchText, String teamId, Pageable pageable) {
-        Page<PostDto.ResponsePostDto> result = postRepository.selectPostListByTeam(searchText, teamId, pageable);
+    public Page<PostDto.SelectPostListDto> selectPostList(String searchText, String teamId, Pageable pageable) {
+        Page<PostDto.SelectPostListDto> result = postRepository.selectPostListByTeam(searchText, teamId, pageable);
 
-        List<PostDto.ResponsePostDto> content = result.getContent();
+        List<PostDto.SelectPostListDto> content = result.getContent();
         content.forEach(responsePostDto -> responsePostDto.setCreateDate(FormatUtil.formatTimeAgo(responsePostDto.getCreateTime())));
 
         return result;
