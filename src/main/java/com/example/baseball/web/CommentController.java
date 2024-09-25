@@ -41,7 +41,7 @@ public class CommentController {
     @MessageMapping("/comment")
     public void sendComment(@RequestBody @Valid CommentDto.SendTopicCommentDto dto) {
         // 클라이언트에 알림 전송
-        messagingTemplate.convertAndSend("/comment/comments/" + dto.getPostAuthorId(), dto);
+        messagingTemplate.convertAndSend("/comment/" + dto.getPostAuthorId(), dto);
     }
 
     @DeleteMapping("/comment/{commentId}")
