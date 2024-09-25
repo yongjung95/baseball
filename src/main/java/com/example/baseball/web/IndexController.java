@@ -99,7 +99,7 @@ public class IndexController {
             model.addAttribute("teamName", dto.getTeamName());
 
             PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize(), Sort.by(Sort.Direction.DESC, "createdDate"));
-            Page<PostDto.ResponsePostDto> postList = postService.selectPostList(requestDto.getSearchText(), dto.getTeamId(), pageRequest);
+            Page<PostDto.SelectPostListDto> postList = postService.selectPostList(requestDto.getSearchText(), dto.getTeamId(), pageRequest);
             model.addAttribute("postList", postList);
 
             boolean isSymbolMatched = false;

@@ -32,6 +32,17 @@ public class PostDto {
     }
 
     @Data
+    public static class SelectPostListDto {
+        private Long postId;
+        private String title;
+        private String authorNickname;
+        private String createDate;
+        private LocalDateTime createTime;
+        private Integer likeCnt;
+        private Integer commentCnt;
+    }
+
+    @Data
     public static class ResponsePostDto {
         private Long postId;
         private String title;

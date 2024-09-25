@@ -6,7 +6,6 @@ import com.example.baseball.domain.Team;
 import com.example.baseball.dto.PostDto;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +60,7 @@ class PostRepositoryTest {
         //when
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC, "createdDate"));
 
-        Page<PostDto.ResponsePostDto> responsePostDtos = postRepository.selectPostListByTeam("작성글", teamId, pageRequest);
+        Page<PostDto.SelectPostListDto> responsePostDtos = postRepository.selectPostListByTeam("작성글", teamId, pageRequest);
 
         //then
         assertThat(responsePostDtos.getTotalElements()).isEqualTo(1);

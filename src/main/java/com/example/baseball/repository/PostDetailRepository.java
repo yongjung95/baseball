@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostDetailRepository {
 
-    Page<PostDto.ResponsePostDto> selectPostListByTeam(String searchText, String teamId, Pageable pageable);
+    Page<PostDto.SelectPostListDto> selectPostListByTeam(String searchText, String teamId, Pageable pageable);
     Post findByPostId(Long postId);
 }
