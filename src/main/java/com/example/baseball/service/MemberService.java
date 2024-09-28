@@ -5,14 +5,14 @@ import com.example.baseball.domain.Team;
 import com.example.baseball.dto.MemberDto;
 import com.example.baseball.repository.MemberRepository;
 import com.example.baseball.repository.TeamRepository;
-import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.response.error.ErrorCode;
+import com.example.baseball.response.exception.ApiException;
 import com.example.baseball.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,6 +30,7 @@ public class MemberService {
     private final ModelMapper modelMapper;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public MemberDto.ResponseMemberDto saveMember(MemberDto.SaveMemberRequestDto dto) {
         Team findTeam = null;
@@ -56,7 +57,7 @@ public class MemberService {
         return convertToDto(member);
     }
 
-    @CachePut("members")
+//    @CachePut("members")
     public MemberDto.ResponseMemberDto updateMember(MemberDto.UpdateMemberRequestDto dto) {
         Member findMember = memberRepository.findByMemberId(dto.getMemberId());
         if (findMember == null) {
@@ -78,6 +79,11 @@ public class MemberService {
             }
             findMember.changeFollowedTeam(findTeam);
         }
+
+        String key = "members:" + findMember.getId();
+        JSONObject jsonObject = new JSONObject(findMember);
+
+        redisTemplate.opsForValue().set(key, jsonObject.toString());
 
         return convertToDto(findMember);
     }
@@ -119,7 +125,6 @@ public class MemberService {
         return jwtUtil.createAccessToken(result);
     }
 
-    @Cacheable("members")
     public MemberDto.ResponseMemberDto selectMemberByMemberId(String memberId) {
         Member findMember = memberRepository.findByMemberId(memberId);
         if (findMember == null) {
