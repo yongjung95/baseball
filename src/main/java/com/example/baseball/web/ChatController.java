@@ -1,12 +1,10 @@
 package com.example.baseball.web;
 
 import com.example.baseball.dto.ChatDto;
-import com.example.baseball.dto.MemberDto;
-import com.example.baseball.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final MemberService memberService;
+    private final RabbitTemplate rabbitTemplate;
 
     @MessageMapping("/sendMessage")
     public void sendMessage(@RequestBody @Valid ChatDto.SendChatDto dto) {
@@ -24,13 +21,6 @@ public class ChatController {
             return;
         }
 
-        MemberDto.ResponseMemberDto responseMemberDto = memberService.selectMemberByMemberId(dto.getChatAuthorId());
-        ChatDto.ReceiveChatDto receiveChatDto = new ChatDto.ReceiveChatDto();
-        receiveChatDto.setChatAuthorId(dto.getChatAuthorId());
-        receiveChatDto.setChatAuthorNickname(responseMemberDto.getNickname());
-        receiveChatDto.setContent(dto.getContent());
-        receiveChatDto.setTeamName(StringUtils.hasText(responseMemberDto.getTeamName()) ? responseMemberDto.getTeamName() : "미정");
-        receiveChatDto.setTeamLogo(StringUtils.hasText(responseMemberDto.getTeamName()) ? responseMemberDto.getTeamLogo() : "/logos/kbo/baseball.svg");
-        messagingTemplate.convertAndSend("/topic/chat", receiveChatDto);
+        rabbitTemplate.convertAndSend("amq.topic", "chatQueue", dto);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -54,11 +55,25 @@ public class RedisConfig {
                 .build();
     }
 
+//    @Bean
+//    public RedisTemplate<String, String> redisTemplate() {
+//        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new StringRedisSerializer());
+//        redisTemplate.setConnectionFactory(redisConnectionFactory());
+//        return redisTemplate;
+//    }
+
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+
+        // Key는 문자열로 직렬화
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        // Value는 JSON으로 직렬화
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         return redisTemplate;
     }

@@ -55,6 +55,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// RabbitMQ
+	implementation 'org.springframework.amqp:spring-rabbit'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.boot:spring-boot-starter-reactor-netty'
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
@@ -64,6 +65,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.json/json
 	implementation group: 'org.json', name: 'json', version: '20240303'
+
+	// LocalTimeDate redis serializer 해결
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
 }
 
 tasks.named('test') {

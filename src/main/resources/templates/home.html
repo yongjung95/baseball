@@ -180,7 +180,7 @@
 
                 chatStompClient.debug = null;
 
-                chatStompClient.subscribe('/topic/chat', function (chat) {
+                chatStompClient.subscribe('/chat', function (chat) {
                     const chatData = JSON.parse(chat.body);
                     if (chatData.chatAuthorId !== memberId) {
                         addMessage(chatData.content, 'other', chatData.chatAuthorNickname, chatData.teamLogo); // 상대방 메시지 추가
