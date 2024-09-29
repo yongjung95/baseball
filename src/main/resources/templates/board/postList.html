@@ -36,7 +36,7 @@
         </table>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation" style="font-family: RixXladywatermelonR, serif"
+        <nav aria-label="Page navigation" style="font-family: LeeSeoyun, serif"
              th:with="start=${(postList.getPageable().getPageNumber() / 10) * 10 + 1},
                   end=(${(postList.getTotalPages() == 0) ? 1 : (start + (10 - 1) < postList.getTotalPages() ? start + (10 - 1) : postList.getTotalPages())})">
             <ul class="pagination justify-content-center">
