@@ -68,6 +68,9 @@ dependencies {
 
 	// LocalTimeDate redis serializer 해결
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+
+	// mariaDB
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 }
 
 tasks.named('test') {
