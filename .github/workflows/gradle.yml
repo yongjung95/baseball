@@ -29,7 +29,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Make gradlew executable
-      run: chmod +x /home/ubuntu/actions-runner/baseball/baseball/baseball/yagguyaggu/gradlew
+      run: chmod +x /home/ubuntu/actions-runner/baseball/baseball/baseball/gradlew
 
     - name: Properties File Copy
       run: cp /home/ubuntu/yagguyaggu/application-real.yml /home/ubuntu/actions-runner/baseball/baseball/baseball/src/main/resources/application-real.yml
