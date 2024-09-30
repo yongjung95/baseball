@@ -37,46 +37,16 @@ jobs:
       run: chmod +x /home/ubuntu/actions-runner/baseball/baseball/baseball/gradlew
 
     - name: Properties File Copy
-      run: cp /home/ubuntu/yagguyaggu/application-real.yml /home/ubuntu/actions-runner/baseball/baseball/baseball/src/main/resources/application-real.yml
+      run: cp /home/ubuntu/baseball/application-real.yml /home/ubuntu/actions-runner/baseball/baseball/baseball/src/main/resources/application-real.yml
 
     - name: Build with Gradle
       run: /home/ubuntu/actions-runner/baseball/baseball/baseball/gradlew clean build -x check
 
     - name: backup
-      run: mv /home/ubuntu/yagguyaggu/yagguyaggu-0.0.1-master.jar /home/ubuntu/yagguyaggu/bak/yagguyaggu-0.0.1-SNAPSHOT.jar_$(date '+%Y%m%d-%H%M%S')
+      run: mv /home/ubuntu/baseball/baseball-0.0.1-master.jar /home/ubuntu/baseball/bak/baseball-0.0.1-SNAPSHOT.jar_$(date '+%Y%m%d-%H%M%S')
 
     - name: deploy
-      run: mv /home/ubuntu/actions-runner/baseball/baseball/baseball/build/libs/yagguyaggu-0.0.1-SNAPSHOT.jar /home/ubuntu/yagguyaggu/yagguyaggu-0.0.1-master.jar
+      run: mv /home/ubuntu/actions-runner/baseball/baseball/baseball/build/libs/baseball-0.0.1-SNAPSHOT.jar /home/ubuntu/baseball/baseball-0.0.1-master.jar
 
     - name: run
-      run: cd /home/ubuntu/yagguyaggu && ./yagguyaggu.sh
-
-    # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-    #   with:
-    #     gradle-version: '8.9'
-    #
-    # - name: Build with Gradle 8.9
-    #   run: gradle build
-
-  dependency-submission:
-
-    runs-on: self-hosted
-    permissions:
-      contents: write
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
-    # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      run: cd /home/ubuntu/baseball && ./baseball.sh
