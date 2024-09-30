@@ -10,8 +10,8 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
 
 jobs:
   build:
@@ -35,6 +35,24 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build
+
+    - name: Make gradlew executable
+      run: chmod +x /home/ubuntu/actions-runner/yagguyaggu_work/yagguyaggu/gradlew
+
+    - name: Properties File Copy
+      run: cp /home/ubuntu/yagguyaggu/application-real.yml /home/ubuntu/actions-runner/yagguyaggu_work/yagguyaggu/src/main/resources/application-real.yml
+
+    - name: Build with Gradle
+      run: /home/ubuntu/actions-runner/yagguyaggu_work/yagguyaggu/gradlew clean build -x check
+
+    - name: backup
+      run: mv /home/ubuntu/yagguyaggu/yagguyaggu-0.0.1-master.jar /home/ubuntu/yagguyaggu/bak/yagguyaggu-0.0.1-SNAPSHOT.jar_$(date '+%Y%m%d-%H%M%S')
+
+    - name: deploy
+      run: mv /home/ubuntu/actions-runner/yagguyaggu_work/yagguyaggu/build/libs/yagguyaggu-0.0.1-SNAPSHOT.jar /home/ubuntu/yagguyaggu/yagguyaggu-0.0.1-master.jar
+
+    - name: run
+      run: cd /home/ubuntu/yagguyaggu && ./yagguyaggu.sh
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
