@@ -34,19 +34,19 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
     - name: Make gradlew executable
-      run: chmod +x /home/ubuntu/actions-runner/baseball/baseball/baseball/gradlew
+      run: chmod +x /home/ubuntu/actions-runner/baseball_work/baseball/baseball/gradlew
 
     - name: Properties File Copy
-      run: cp /home/ubuntu/baseball/application-real.yml /home/ubuntu/actions-runner/baseball/baseball/baseball/src/main/resources/application-real.yml
+      run: cp /home/ubuntu/baseball/application-real.yml /home/ubuntu/actions-runner/baseball_work/baseball/baseball/src/main/resources/application-real.yml
 
     - name: Build with Gradle
-      run: /home/ubuntu/actions-runner/baseball/baseball/baseball/gradlew clean build -x check
+      run: /home/ubuntu/actions-runner/baseball_work/baseball/baseball/gradlew clean build -x check
 
     - name: backup
       run: mv /home/ubuntu/baseball/baseball-0.0.1-master.jar /home/ubuntu/baseball/bak/baseball-0.0.1-SNAPSHOT.jar_$(date '+%Y%m%d-%H%M%S')
 
     - name: deploy
-      run: mv /home/ubuntu/actions-runner/baseball/baseball/baseball/build/libs/baseball-0.0.1-SNAPSHOT.jar /home/ubuntu/baseball/baseball-0.0.1-master.jar
+      run: mv /home/ubuntu/actions-runner/baseball_work/baseball/baseball/build/libs/baseball-0.0.1-SNAPSHOT.jar /home/ubuntu/baseball/baseball-0.0.1-master.jar
 
     - name: run
       run: cd /home/ubuntu/baseball && ./baseball.sh
