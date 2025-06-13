@@ -30,6 +30,10 @@ public class ChatService {
     public void receiveMessage(ChatDto.SendChatDto dto) {
         Member findMember = memberRepository.findByMemberId(dto.getChatAuthorId());
 
+        if (findMember == null) {
+            return;
+        }
+
         ChatDto.ReceiveChatDto receiveChatDto = new ChatDto.ReceiveChatDto();
         receiveChatDto.setChatAuthorId(findMember.getMemberId());
         receiveChatDto.setChatAuthorNickname(findMember.getNickname());
